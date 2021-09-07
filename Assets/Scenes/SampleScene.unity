@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &421904751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,6 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d16cbd73e282684ca8ca3be6ecaea82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  title: 
   options:
   - color: {r: 0.8156863, g: 0, b: 0, a: 1}
     sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
