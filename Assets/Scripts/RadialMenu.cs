@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class RadialMenu : MonoBehaviour
 {
-    public float speed = 0.5f;
+    public float speed = 8;
     public Text label;
     public RadialButton buttonPrefab;
     public RadialButton selected;
@@ -73,16 +73,11 @@ public class RadialMenu : MonoBehaviour
     IEnumerator TurnAnimation()
     {
         float timer = 0f;
-        Vector3[] oldButtonPos = new Vector3[buttons.Length];
 
-        for(int i=0; i<buttons.Length; i++) {
-            oldButtonPos[i] = buttons[i].transform.localPosition;
-        }
-
-        while (timer < 1 / speed) {
+        while (timer <= 1 / speed) {
             timer += Time.deltaTime;
             for(int i=0; i<buttons.Length; i++) {
-                buttons[i].transform.localPosition = Vector3.Lerp(oldButtonPos[i] , newButtonPositions[i], timer);
+                buttons[i].transform.localPosition = Vector3.Lerp(buttons[i].transform.localPosition , newButtonPositions[i], timer *speed);
             }
             yield return null;
         }
