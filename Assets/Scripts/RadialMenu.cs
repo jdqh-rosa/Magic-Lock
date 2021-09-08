@@ -9,7 +9,7 @@ public class RadialMenu : MonoBehaviour
     public Text label;
     public RadialButton buttonPrefab;
     public RadialButton selected;
-    private int selectedInt;
+    private int selectedInt = 0;
     private RadialButton[] buttons;
     private Vector3[] newButtonPositions;
 
@@ -51,16 +51,21 @@ public class RadialMenu : MonoBehaviour
         }
 
         if (Input.GetKeyUp(KeyCode.RightArrow)) {
-            TurnMenu(1);
+            TurnMenu(-1);
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            TurnMenu(-1);
+            TurnMenu(1);
         }
     }
 
     public void TurnMenu(int tileAmount)
     {
         selectedInt += tileAmount;
+
+        while (selectedInt < 0 || selectedInt > buttons.Length) {
+            selectedInt = (selectedInt > buttons.Length) ? selectedInt - buttons.Length : selectedInt + buttons.Length;
+        }
+
         for (int i = 0; i < buttons.Length; i++) {
             float theta = (2 * Mathf.PI / buttons.Length) * (i + selectedInt);
             float xPos = Mathf.Sin(theta);
@@ -76,8 +81,8 @@ public class RadialMenu : MonoBehaviour
 
         while (timer <= 1 / speed) {
             timer += Time.deltaTime;
-            for(int i=0; i<buttons.Length; i++) {
-                buttons[i].transform.localPosition = Vector3.Lerp(buttons[i].transform.localPosition , newButtonPositions[i], timer *speed);
+            for (int i = 0; i < buttons.Length; i++) {
+                buttons[i].transform.localPosition = Vector3.Lerp(buttons[i].transform.localPosition, newButtonPositions[i], timer * speed);
             }
             yield return null;
         }
