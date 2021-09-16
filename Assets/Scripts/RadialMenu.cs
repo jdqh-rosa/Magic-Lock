@@ -51,10 +51,10 @@ public class RadialMenu : MonoBehaviour
         }
 
         if (Input.GetKeyUp(KeyCode.RightArrow)) {
-            TurnMenu(-1);
+            TurnMenu(1);
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            TurnMenu(1);
+            TurnMenu(-1);
         }
     }
 
@@ -62,9 +62,11 @@ public class RadialMenu : MonoBehaviour
     {
         selectedInt += tileAmount;
 
-        while (selectedInt < 0 || selectedInt > buttons.Length) {
-            selectedInt = (selectedInt > buttons.Length) ? selectedInt - buttons.Length : selectedInt + buttons.Length;
+        while (selectedInt < 0 || selectedInt > buttons.Length - 1) {
+            selectedInt = (selectedInt > buttons.Length - 1) ? selectedInt - buttons.Length : selectedInt + buttons.Length;
         }
+
+        selected = buttons[selectedInt];
 
         for (int i = 0; i < buttons.Length; i++) {
             float theta = (2 * Mathf.PI / buttons.Length) * (i + selectedInt);
