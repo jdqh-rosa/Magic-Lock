@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class RadialMenu : MonoBehaviour
 {
     public float speed = 8;
+    public float radius = 100f;
     public Text label;
     public RadialButton buttonPrefab;
     public RadialButton selected;
@@ -28,10 +29,7 @@ public class RadialMenu : MonoBehaviour
             RadialButton newButton = Instantiate(buttonPrefab) as RadialButton;
             buttons[i] = newButton;
             newButton.transform.SetParent(transform, false);
-            float theta = (2 * Mathf.PI / obj.options.Length) * i;
-            float xPos = Mathf.Sin(theta);
-            float yPos = Mathf.Cos(theta);
-            newButton.transform.localPosition = new Vector2(xPos, yPos) * 100f;
+            newButton.transform.localPosition = Helper.CalculateDegPos((360/obj.options.Length)*i +90, radius);
             newButton.circle.color = obj.options[i].color;
             newButton.icon.sprite = obj.options[i].sprite;
             newButton.title = obj.options[i].title;
@@ -51,10 +49,10 @@ public class RadialMenu : MonoBehaviour
         }
 
         if (Input.GetKeyUp(KeyCode.RightArrow)) {
-            TurnMenu(1);
+            TurnMenu(-1);
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            TurnMenu(-1);
+            TurnMenu(1);
         }
     }
 
@@ -69,10 +67,7 @@ public class RadialMenu : MonoBehaviour
         selected = buttons[selectedInt];
 
         for (int i = 0; i < buttons.Length; i++) {
-            float theta = (2 * Mathf.PI / buttons.Length) * (i + selectedInt);
-            float xPos = Mathf.Sin(theta);
-            float yPos = Mathf.Cos(theta);
-            newButtonPositions[i] = new Vector2(xPos, yPos) * 100f;
+            newButtonPositions[i] = Helper.CalculateDegPos((360/buttons.Length)*(i + selectedInt)+90, radius);
         }
         StartCoroutine(TurnAnimation());
     }

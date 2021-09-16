@@ -17,15 +17,14 @@ public class Interactable : MonoBehaviour
 
     private void Start()
     {
-        if (title == "" || title == null){
+        if (title == "" || title == null) {
             title = gameObject.name;
         }
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
+        if (Input.GetKeyDown(KeyCode.Space)) {
             RadialMenuSpawner.inst.SpawnMenu(this);
         }
     }
