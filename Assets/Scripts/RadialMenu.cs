@@ -29,7 +29,7 @@ public class RadialMenu : MonoBehaviour
             RadialButton newButton = Instantiate(buttonPrefab) as RadialButton;
             buttons[i] = newButton;
             newButton.transform.SetParent(transform, false);
-            newButton.transform.localPosition = Helper.CalculateDegPos((360/obj.options.Length)*i +90, radius);
+            newButton.transform.localPosition = Helper.CalculateDegPos((360 / obj.options.Length) * i + 90, radius);
             newButton.circle.color = obj.options[i].color;
             newButton.icon.sprite = obj.options[i].sprite;
             newButton.title = obj.options[i].title;
@@ -47,13 +47,6 @@ public class RadialMenu : MonoBehaviour
             }
             Destroy(gameObject);
         }
-
-        if (Input.GetKeyUp(KeyCode.RightArrow)) {
-            TurnMenu(-1);
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            TurnMenu(1);
-        }
     }
 
     public void TurnMenu(int tileAmount)
@@ -67,7 +60,7 @@ public class RadialMenu : MonoBehaviour
         selected = buttons[selectedInt];
 
         for (int i = 0; i < buttons.Length; i++) {
-            newButtonPositions[i] = Helper.CalculateDegPos((360/buttons.Length)*(i + selectedInt)+90, radius);
+            newButtonPositions[i] = Helper.CalculateDegPos((360 / buttons.Length) * (i + selectedInt) + 90, radius);
         }
         StartCoroutine(TurnAnimation());
     }
@@ -79,6 +72,7 @@ public class RadialMenu : MonoBehaviour
         while (timer <= 1 / speed) {
             timer += Time.deltaTime;
             for (int i = 0; i < buttons.Length; i++) {
+                if (buttons[i] == null) yield return null;
                 buttons[i].transform.localPosition = Vector3.Lerp(buttons[i].transform.localPosition, newButtonPositions[i], timer * speed);
             }
             yield return null;

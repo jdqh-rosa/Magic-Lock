@@ -192,26 +192,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 488089314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d16cbd73e282684ca8ca3be6ecaea82, type: 3}
+  m_Script: {fileID: 11500000, guid: 45a143cf6a0d09247a33f4b4f5274be7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   title: 
   options:
-  - color: {r: 0.8156863, g: 0, b: 0, a: 1}
+  - color: {r: 1, g: 0, b: 1, a: 1}
     sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: 1A
-  - color: {r: 0.17925128, g: 0.8156863, b: 0, a: 1}
+    title: A1
+  - color: {r: 1, g: 0, b: 0, a: 1}
     sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: 2B
-  - color: {r: 0, g: 0.8156863, b: 0.7907015, a: 1}
+    title: B2
+  - color: {r: 0, g: 1, b: 0, a: 1}
     sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: 3C
-  - color: {r: 0.11934761, g: 0, b: 0.8156863, a: 1}
+    title: C3
+  - color: {r: 0, g: 0, b: 1, a: 1}
     sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: 4D
-  - color: {r: 0.8156863, g: 0.7912305, b: 0, a: 1}
+    title: D4
+  - color: {r: 1, g: 1, b: 0, a: 1}
     sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: 5E
+    title: E5
 --- !u!4 &488089316
 Transform:
   m_ObjectHideFlags: 0

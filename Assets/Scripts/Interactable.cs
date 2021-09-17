@@ -14,6 +14,7 @@ public class Interactable : MonoBehaviour
 
     public string title;
     public Action[] options;
+    protected private RadialMenu radialMenu;
 
     private void Start()
     {
@@ -22,10 +23,10 @@ public class Interactable : MonoBehaviour
         }
     }
 
-    private void Update()
+    virtual public void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) {
-            RadialMenuSpawner.inst.SpawnMenu(this);
+            radialMenu = RadialMenuSpawner.inst.SpawnMenu(this);
         }
     }
 }

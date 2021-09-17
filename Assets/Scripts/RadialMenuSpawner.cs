@@ -13,11 +13,12 @@ public class RadialMenuSpawner : MonoBehaviour
         inst = this;
     }
 
-    public void SpawnMenu(Interactable obj)
+    public RadialMenu SpawnMenu(Interactable obj)
     {
         RadialMenu newMenu = Instantiate(menuPrefab) as RadialMenu;
         newMenu.transform.SetParent(transform, false);
         newMenu.label.text = obj.title.ToUpper();
         newMenu.SpawnButtons(obj);
+        return newMenu;
     }
 }
