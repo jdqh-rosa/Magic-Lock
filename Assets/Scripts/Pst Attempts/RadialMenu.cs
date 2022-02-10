@@ -51,6 +51,8 @@ public class RadialMenu : MonoBehaviour
 
     public void TurnMenu(int tileAmount)
     {
+        if (buttons[buttons.Length - 1] == null) return; 
+
         selectedInt += tileAmount;
 
         while (selectedInt < 0 || selectedInt > buttons.Length - 1) {
@@ -73,6 +75,7 @@ public class RadialMenu : MonoBehaviour
             timer += Time.deltaTime;
             for (int i = 0; i < buttons.Length; i++) {
                 if (buttons[i] == null) yield return null;
+
                 buttons[i].transform.localPosition = Vector3.Lerp(buttons[i].transform.localPosition, newButtonPositions[i], timer * speed);
             }
             yield return null;
