@@ -25,9 +25,11 @@ public class RadialMenuController : Interactable
                     menuLayers[currentLayer] = RadialMenuSpawner.inst.SpawnMenu(this);
                     menuLayers[currentLayer].radius += 50;
                 }
+                menuLayers[currentLayer].gameObject.SetActive(true);
             }
             if (Input.GetKeyDown(KeyCode.DownArrow)) {
                 currentLayer = (currentLayer <= 0) ? currentLayer : currentLayer - 1;
+                menuLayers[currentLayer+1].gameObject.SetActive(false);
             }
         }
         else {
