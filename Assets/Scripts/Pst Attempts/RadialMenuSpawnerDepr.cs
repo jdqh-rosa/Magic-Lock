@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RadialMenuSpawner : MonoBehaviour
+public class RadialMenuSpawnerDepr : MonoBehaviour
 {
-    public static RadialMenuSpawner inst;
-    public RadialMenu menuPrefab;
+    public static RadialMenuSpawnerDepr inst;
+    public RadialMenuDepr menuPrefab;
 
 
     private void Awake()
@@ -13,9 +13,9 @@ public class RadialMenuSpawner : MonoBehaviour
         inst = this;
     }
 
-    public RadialMenu SpawnMenu(Interactable obj)
+    public RadialMenuDepr SpawnMenu(Interactable obj)
     {
-        RadialMenu newMenu = Instantiate(menuPrefab) as RadialMenu;
+        RadialMenuDepr newMenu = Instantiate(menuPrefab) as RadialMenuDepr;
         newMenu.transform.SetParent(transform, false);
         newMenu.label.text = obj.title.ToUpper();
         newMenu.SpawnButtons(obj);

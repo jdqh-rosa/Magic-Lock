@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3272dfc0b851cd048bce06800476591e, type: 3}
+  m_Name: SpellTypeRing
+  m_EditorClassIdentifier: 
+  Elements:
+  - {fileID: 11400000, guid: 6b3a3d9d6aa5e98498e5eb4732f83180, type: 2}
+  - {fileID: 11400000, guid: 36730f7b6a10a7a4c8b034eaa661b8c7, type: 2}
+  - {fileID: 11400000, guid: dec2d8736d2bb1541b7ea80cb766afdd, type: 2}
+  - {fileID: 11400000, guid: 8331dc2984cbef849bd5aedd87cc6e3f, type: 2}
+  NextRing: {fileID: 11400000, guid: 56041a77d608e5044879f6048674377e, type: 2}

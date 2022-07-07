@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class RadialButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class RadialButtonDepr : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Image circle;
     public Image icon;
     public string title;
-    public RadialMenu myMenu;
+    public RadialMenuDepr myMenu;
     public float speed = 8f;
 
     Color defaultColour;

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RadialMenu : MonoBehaviour
+public class RadialMenuDepr : MonoBehaviour
 {
     public float speed = 8;
     public float radius = 100f;
     public Text label;
-    public RadialButton buttonPrefab;
-    public RadialButton selected;
+    public RadialButtonDepr buttonPrefab;
+    public RadialButtonDepr selected;
     private int selectedInt = 0;
-    private RadialButton[] buttons;
+    private RadialButtonDepr[] buttons;
     private Vector3[] newButtonPositions;
 
     // Start is called before the first frame update
@@ -22,11 +22,11 @@ public class RadialMenu : MonoBehaviour
 
     IEnumerator AnimateButtons(Interactable obj)
     {
-        buttons = new RadialButton[obj.options.Length];
+        buttons = new RadialButtonDepr[obj.options.Length];
         newButtonPositions = new Vector3[obj.options.Length];
 
         for (int i = 0; i < obj.options.Length; i++) {
-            RadialButton newButton = Instantiate(buttonPrefab) as RadialButton;
+            RadialButtonDepr newButton = Instantiate(buttonPrefab) as RadialButtonDepr;
             buttons[i] = newButton;
             newButton.transform.SetParent(transform, false);
             newButton.transform.localPosition = Helper.CalculateDegPos((360 / obj.options.Length) * i + 90, radius);

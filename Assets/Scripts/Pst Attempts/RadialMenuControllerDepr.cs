@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RadialMenuController : Interactable
+public class RadialMenuControllerDepr : Interactable
 {
-    public RadialMenu[] menuLayers = new RadialMenu[2];
+    public RadialMenuDepr[] menuLayers = new RadialMenuDepr[2];
     private int currentLayer = 0;
     override public void Update()
     {
@@ -22,7 +22,7 @@ public class RadialMenuController : Interactable
             if (Input.GetKeyDown(KeyCode.UpArrow)) {
                 currentLayer = (currentLayer >= menuLayers.Length-1) ? currentLayer : currentLayer + 1;
                 if (menuLayers[currentLayer] == null) {
-                    menuLayers[currentLayer] = RadialMenuSpawner.inst.SpawnMenu(this);
+                    menuLayers[currentLayer] = RadialMenuSpawnerDepr.inst.SpawnMenu(this);
                     menuLayers[currentLayer].radius += 50;
                 }
                 menuLayers[currentLayer].gameObject.SetActive(true);
