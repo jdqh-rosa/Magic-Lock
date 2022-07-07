@@ -175,8 +175,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 488089316}
-  - component: {fileID: 488089315}
-  - component: {fileID: 488089317}
   - component: {fileID: 488089318}
   m_Layer: 0
   m_Name: Player
@@ -185,38 +183,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &488089315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488089314}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45a143cf6a0d09247a33f4b4f5274be7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  title: 
-  options:
-  - color: {r: 1, g: 0, b: 1, a: 1}
-    sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: A1
-  - color: {r: 1, g: 0, b: 0, a: 1}
-    sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: B2
-  - color: {r: 0, g: 1, b: 0, a: 1}
-    sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: C3
-  - color: {r: 0, g: 0, b: 1, a: 1}
-    sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: D4
-  - color: {r: 1, g: 1, b: 0, a: 1}
-    sprite: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
-    title: E5
-  menuLayers:
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!4 &488089316
 Transform:
   m_ObjectHideFlags: 0
@@ -231,20 +197,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &488089317
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488089314}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fffeeee3636bbde419c1b1a5cb5c5581, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MainMenuPrefab: {fileID: -4968094192702421427, guid: e93262c3d0e438045a3a3ceddc455ad0, type: 3}
-  Mode: 0
 --- !u!114 &488089318
 MonoBehaviour:
   m_ObjectHideFlags: 0
