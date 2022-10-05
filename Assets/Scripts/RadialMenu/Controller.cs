@@ -18,6 +18,7 @@ public class Controller : MonoBehaviour
         SetMode(ControllerMode.Cast);
         radialMenuController = new RadialMenuController();
         radialMenuController.RadialMenuPrefab = RadialMenuPrefab;
+        radialMenuController.SpawnMenu();
     }
 
     // Update is called once per frame
@@ -27,10 +28,10 @@ public class Controller : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space)) {
                 //SetMode(ControllerMode.Menu);
-                radialMenuController.SpawnMenu();
+                //radialMenuController.SpawnMenu();
             }
             if (Input.GetKeyUp(KeyCode.Space)) {
-                radialMenuController.DestroyMenu();
+                //radialMenuController.DestroyMenu();
             }
             if (Input.GetKeyDown(KeyCode.RightArrow)) {
                 radialMenuController.TurnMenuRight();
