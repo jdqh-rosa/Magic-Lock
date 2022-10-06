@@ -6,6 +6,7 @@ using UnityEngine;
 public class RadialMenu : MonoBehaviour
 {
     public RadialRing Data;
+    public RadialRing[] Rings;
     public RadialButton buttonPrefab;
     public float GapWidthDegree = 1f;
     public float radius = 100f;
@@ -25,6 +26,12 @@ public class RadialMenu : MonoBehaviour
     private Color _selectedColor = new Color(1f, 1f, 1f, 0.75f);
     private Color _unselectedColor = new Color(1f, 1f, 1f, 0.5f);
 
+    private void Start()
+    {
+        lineCircle = Instantiate(lineCircle, transform);
+        lineCircle.transform.localScale = new Vector3(radius, radius) * 0.5f;
+    }
+
     public void SpawnButtons()
     {
         StartCoroutine(AnimateButtons());
@@ -37,7 +44,7 @@ public class RadialMenu : MonoBehaviour
 
         //get distance between Icon and Background
         var iconDist = Vector3.Distance(buttonPrefab.Icon.transform.position, buttonPrefab.Background.transform.position);
-
+        
         //position the elements
         Buttons = new RadialButton[Data.Elements.Length];
         NewButtonPositions = new Vector3[Data.Elements.Length];

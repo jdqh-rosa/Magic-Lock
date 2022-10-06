@@ -1,0 +1,5 @@
+-facilitate dynamic menu creation
+-delegate radialmenu tasks
+-improve feel
+	-improve menu turning animation
+-make pretty

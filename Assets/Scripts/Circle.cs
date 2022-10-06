@@ -6,7 +6,7 @@ public class Circle : MonoBehaviour
 {
     public int vertexCount = 40;
     public float lineWidth = -.2f;
-    public float radius;
+    public float radius = 100f;
     public bool circleFillScreen;
 
     private LineRenderer lineRenderer;

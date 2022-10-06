@@ -11,13 +11,13 @@ public class Controller : MonoBehaviour
     [HideInInspector]
     public ControllerMode Mode;
 
-    private RadialMenuController radialMenuController;
+    public RadialMenuController radialMenuController;
 
     void Start()
     {
         SetMode(ControllerMode.Cast);
-        radialMenuController = new RadialMenuController();
-        radialMenuController.RadialMenuPrefab = RadialMenuPrefab;
+        //radialMenuController = new RadialMenuController();
+        //radialMenuController.RadialMenuPrefab = RadialMenuPrefab;
         radialMenuController.SpawnMenu();
     }
 
@@ -62,7 +62,6 @@ public class Controller : MonoBehaviour
 
             //do other controller stuff here
 
-
         }
     }
 
@@ -73,7 +72,6 @@ public class Controller : MonoBehaviour
         //GetComponent<Spell>().SetPrefab(int.Parse(paths[1]), int.Parse(paths[2]));
         SetMode(ControllerMode.Cast);
     }
-
     public void SetMode(ControllerMode mode)
     {
         Mode = mode;
@@ -93,7 +91,6 @@ public class Controller : MonoBehaviour
                 break;
         }
     }
-
     public enum ControllerMode
     {
         Play, Cast, Menu

@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 421904752}
   - component: {fileID: 421904751}
   - component: {fileID: 421904753}
+  - component: {fileID: 421904754}
   m_Layer: 0
   m_Name: Test
   m_TagString: Untagged
@@ -181,6 +182,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
   Mode: 0
+  radialMenuController: {fileID: 421904754}
+--- !u!114 &421904754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 421904750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04e48959bced7dd47addab842bbda20f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: 
+  options: []
+  RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
+  menuLayers:
+  - {fileID: 0}
+  createBool: 1
 --- !u!1 &488089314
 GameObject:
   m_ObjectHideFlags: 0
@@ -226,6 +246,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
   Mode: 0
+  radialMenuController: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
