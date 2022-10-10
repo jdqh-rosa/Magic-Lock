@@ -29,7 +29,6 @@ public class RadialMenuController : Interactable
         if (!createBool)
         {
             RadialMenu newMenu = Instantiate(RadialMenuPrefab, FindObjectOfType<Canvas>().transform);
-            //menuLayers[index] = newMenu;
             menuLayers.Add(newMenu);
         }
         menuLayers[index].SpawnButtons();
@@ -75,6 +74,7 @@ public class RadialMenuController : Interactable
         }
         else
         {
+            menuLayers[index].NextRing();
             return menuLayers[index].Path;
         }
     }

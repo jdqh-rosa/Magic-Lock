@@ -44,9 +44,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Data: {fileID: 11400000, guid: f1fb4ac6d20a6eb408ee8fdcaf275fb8, type: 2}
+  Rings: []
   buttonPrefab: {fileID: 8426322464565684634, guid: 418ffb5ad05aaad458d646bae6ea3a1c, type: 3}
   GapWidthDegree: 1
   radius: 100
   lineCircle: {fileID: 6634903730378418066, guid: f44a331a8d81cd048b3913af836582b2, type: 3}
   Path: 
-  speed: 8
+  turnTime: 1

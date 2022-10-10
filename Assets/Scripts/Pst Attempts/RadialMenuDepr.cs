@@ -29,7 +29,7 @@ public class RadialMenuDepr : MonoBehaviour
             RadialButtonDepr newButton = Instantiate(buttonPrefab) as RadialButtonDepr;
             buttons[i] = newButton;
             newButton.transform.SetParent(transform, false);
-            newButton.transform.localPosition = Helper.CalculateDegPos((360 / obj.options.Length) * i + 90, radius);
+            newButton.transform.localPosition = Helper.PolarToCart((360 / obj.options.Length) * i + 90, radius);
             newButton.circle.color = obj.options[i].color;
             newButton.icon.sprite = obj.options[i].sprite;
             newButton.title = obj.options[i].title;
@@ -62,7 +62,7 @@ public class RadialMenuDepr : MonoBehaviour
         selected = buttons[selectedInt];
 
         for (int i = 0; i < buttons.Length; i++) {
-            newButtonPositions[i] = Helper.CalculateDegPos((360 / buttons.Length) * (i + selectedInt) + 90, radius);
+            newButtonPositions[i] = Helper.PolarToCart((360 / buttons.Length) * (i + selectedInt) + 90, radius);
         }
         StartCoroutine(TurnAnimation());
     }
