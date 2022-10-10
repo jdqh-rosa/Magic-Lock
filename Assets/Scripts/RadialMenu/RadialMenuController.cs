@@ -14,8 +14,10 @@ public class RadialMenuController : Interactable
 
     private void Start()
     {
-        menuLayers = new List<RadialMenu>();
-
+        if (createBool)
+        {
+            menuLayers = new List<RadialMenu>();
+        }
     }
 
     override public void Update() { }
