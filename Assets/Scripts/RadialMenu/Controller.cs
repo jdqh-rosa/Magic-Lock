@@ -19,6 +19,7 @@ public class Controller : MonoBehaviour
         //radialMenuController = new RadialMenuController();
         //radialMenuController.RadialMenuPrefab = RadialMenuPrefab;
         radialMenuController.SpawnMenu();
+
     }
 
     // Update is called once per frame

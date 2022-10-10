@@ -198,9 +198,8 @@ MonoBehaviour:
   title: 
   options: []
   RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
-  menuLayers:
-  - {fileID: 0}
-  createBool: 1
+  menuLayers: []
+  createBool: 0
 --- !u!1 &488089314
 GameObject:
   m_ObjectHideFlags: 0
