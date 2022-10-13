@@ -50,4 +50,4 @@ MonoBehaviour:
   radius: 100
   lineCircle: {fileID: 6634903730378418066, guid: f44a331a8d81cd048b3913af836582b2, type: 3}
   Path: 
-  turnTime: 1
+  turnTime: 0.3

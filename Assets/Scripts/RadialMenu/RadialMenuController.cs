@@ -68,6 +68,7 @@ public class RadialMenuController : Interactable
             else
             {
                 menuLayers[index + 1].gameObject.SetActive(true);
+                menuLayers[index + 1].TurnMenu(0);
             }
             index++;
             return null;
