@@ -6,7 +6,6 @@ using UnityEngine;
 public class RadialMenu : MonoBehaviour
 {
     public RadialRing Data;
-    public RadialRing[] Rings;
     public RadialButton buttonPrefab;
     public float GapWidthDegree = 1f;
     public float radius = 100f;
@@ -93,9 +92,10 @@ public class RadialMenu : MonoBehaviour
         }
     }
 
-    public RadialMenu NextRing()
+    public RadialMenu NextRing(RadialRing radRing)
     {
-        var path = Path + "/" + Data.Elements[selectedInt].Name;
+        Path = Data.Elements[selectedInt].Name;
+        if(radRing != null) { return null; }
         if (Data.NextRing != null)
         {
             var newSubRing = Instantiate(gameObject, transform.parent).GetComponent<RadialMenu>();
@@ -114,8 +114,7 @@ public class RadialMenu : MonoBehaviour
         }
         else
         {
-            Debug.Log(path);
-            callback?.Invoke(path);
+            //callback?.Invoke(path);
             return null;
         }
         //gameObject.SetActive(false);

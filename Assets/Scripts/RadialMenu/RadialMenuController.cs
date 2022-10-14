@@ -12,6 +12,8 @@ public class RadialMenuController : Interactable
 
     public bool createBool = false;
 
+    public string[] paths;
+
     private void Start()
     {
         if (createBool)
@@ -32,6 +34,15 @@ public class RadialMenuController : Interactable
             menuLayers.Add(newMenu);
         }
         menuLayers[index].SpawnButtons();
+
+        RadialRing swa = menuLayers[index].Data;
+        int i = 1;
+        while(swa.NextRing != null)
+        {
+            swa = swa.NextRing;
+            i++;
+        }
+        paths = new string[i];
     }
     public string DestroyMenu()
     {
@@ -62,11 +73,14 @@ public class RadialMenuController : Interactable
             Debug.Log(string.Format("index:{0} , count:{1}", index + 1, menuLayers.Count));
             if (index + 1 == menuLayers.Count)
             {
-                menuLayers.Add(menuLayers[index].NextRing());
+                menuLayers.Add(menuLayers[index].NextRing(null));
+                paths[index] = menuLayers[index].Path;
                 menuLayers[index + 1].SpawnButtons();
             }
             else
             {
+                menuLayers[index].NextRing(menuLayers[index].Data);
+                paths[index] = menuLayers[index].Path;
                 menuLayers[index + 1].gameObject.SetActive(true);
                 menuLayers[index + 1].TurnMenu(0);
             }
@@ -75,7 +89,14 @@ public class RadialMenuController : Interactable
         }
         else
         {
-            menuLayers[index].NextRing();
+            menuLayers[index].NextRing(menuLayers[index].Data);
+            paths[index] = menuLayers[index].Path;
+            string ss = "";
+            foreach(string s in paths)
+            {
+                ss += s + ", ";
+            }
+            Debug.Log(ss);
             return menuLayers[index].Path;
         }
     }
