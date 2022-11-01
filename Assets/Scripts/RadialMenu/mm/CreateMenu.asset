@@ -16,6 +16,5 @@ MonoBehaviour:
   elementTemplate: {fileID: 11400000, guid: 57b821b8c20381a41baeae49b6a5a90d, type: 2}
   rings:
   - {fileID: 11400000, guid: 751bfc2830909c24ca30c27f0cfa061b, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 704a87fc458753749971041f4bf9ca08, type: 2}
+  - {fileID: 11400000, guid: 67b20ccfa8e3068478c4fdaff3be632c, type: 2}

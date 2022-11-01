@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3272dfc0b851cd048bce06800476591e, type: 3}
   m_Name: SubRing3
   m_EditorClassIdentifier: 
-  Elements: []
+  Elements:
+  - {fileID: 11400000, guid: 57b821b8c20381a41baeae49b6a5a90d, type: 2}
+  - {fileID: 11400000, guid: e2cb054986f57e24a86528cd56686943, type: 2}
+  - {fileID: 11400000, guid: 9d3680c5758263e47bdfc631d71842cf, type: 2}
   NextRing: {fileID: 0}
