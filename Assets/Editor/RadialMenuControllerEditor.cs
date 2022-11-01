@@ -7,7 +7,7 @@ using System.Collections.Generic;
 [CanEditMultipleObjects]
 public class RadialMenuControllerEditor : Editor
 {
-    /*
+    
     RadialMenuController radialMC;
     SerializedProperty createBool;
 
@@ -61,5 +61,5 @@ public class RadialMenuControllerEditor : Editor
             }
         }
     }
-    */
+    
 }

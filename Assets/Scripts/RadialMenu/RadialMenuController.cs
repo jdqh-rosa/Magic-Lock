@@ -30,6 +30,7 @@ public class RadialMenuController : Interactable
 
         if (!createBool)
         {
+            menuLayers = new List<RadialMenu>();
             RadialMenu newMenu = Instantiate(RadialMenuPrefab, FindObjectOfType<Canvas>().transform);
             menuLayers.Add(newMenu);
         }
