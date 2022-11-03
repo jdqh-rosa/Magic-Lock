@@ -1,0 +1,6 @@
+Spell contains Actions
+Actions activate in sequence
+
+Inversion of Control design pattern
+
+magicka
