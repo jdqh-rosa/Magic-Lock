@@ -95,7 +95,7 @@ public class RadialMenu : MonoBehaviour
     public RadialMenu NextRing(RadialRing radRing)
     {
         Path = Data.Elements[selectedInt].Name;
-        if(radRing != null) { return null; }
+        if (radRing != null) { return null; }
         if (Data.NextRing != null)
         {
             var newSubRing = Instantiate(gameObject, transform.parent).GetComponent<RadialMenu>();
@@ -122,6 +122,7 @@ public class RadialMenu : MonoBehaviour
 
 
     bool coroutineRunning = false;
+    bool coroutineSprinting = false;
     public void TurnMenu(int tileAmount)
     {
 
@@ -131,7 +132,7 @@ public class RadialMenu : MonoBehaviour
 
         if (!coroutineRunning)
         {
-
+            coroutineSprinting = coroutineRunning;
             selectedInt += tileAmount;
 
             while (selectedInt < 0 || selectedInt > Buttons.Length - 1)
@@ -147,35 +148,46 @@ public class RadialMenu : MonoBehaviour
         }
         else
         {
-            StopCoroutine(TurnAnimation());
-            ResetButtonPositions();
+            coroutineSprinting= coroutineRunning;
+            //StopCoroutine(TurnAnimation());
+            //ResetButtonPositions();
         }
     }
 
+    private float speedMultiplier = 1f;
+    private float accelerationFactor = 0.5f;
     IEnumerator TurnAnimation()
     {
         float timer = 0f;
-        float completion = 0;
         coroutineRunning = true;
 
-        while (1 - completion >= 0.001)
+        float currentTurnTime = turnTime;
+
+        while (timer < currentTurnTime)
         {
-            timer += Time.fixedDeltaTime;
+            if (coroutineSprinting)
+            {
+                //currentTurnTime *= accelerationFactor;
+                speedMultiplier = 2f;
+            }
+
+            timer += Time.deltaTime * speedMultiplier;
+            float completion = timer / currentTurnTime;
+
             for (int i = 0; i < Buttons.Length; i++)
             {
-                if (Buttons[i] == null) yield return null;
+                if (Buttons[i] == null) continue;
 
-                float differAngle = NewButtonPositions[i] - CurrentButtonPositions[i];
-                //if(differAngle > 180) { differAngle -= 180; }
-                if (differAngle > 360 / Buttons.Length) { differAngle = NewButtonPositions[i] - 360; }
-                 else if (differAngle < -360 / Buttons.Length) { differAngle = 360 / Buttons.Length; }
+                float currentAngle = CurrentButtonPositions[i];
+                float targetAngle = NewButtonPositions[i];
 
-                completion = timer / (turnTime - (turnTime % Time.fixedDeltaTime));
-                float stepAngle = differAngle / (turnTime / Time.fixedDeltaTime);
+                float exponentialCompletion = Mathf.Pow(completion , speedMultiplier);
 
-                Buttons[i].transform.localPosition = Helper.OrbitPoint(transform.localPosition, Buttons[i].transform.localPosition, stepAngle);
+                float newAngle = Mathf.LerpAngle(currentAngle, targetAngle, exponentialCompletion);
+
+                Buttons[i].transform.localPosition = Helper.PolarToCart(newAngle, radius);
             }
-            yield return null;
+            yield return new WaitForFixedUpdate();
         }
         for (int i = 0; i < Buttons.Length; i++)
         {
@@ -183,6 +195,7 @@ public class RadialMenu : MonoBehaviour
             CurrentButtonPositions[i] = NewButtonPositions[i];
         }
         coroutineRunning = false;
+        speedMultiplier = 1f;
     }
 
     void ResetButtonPositions()
