@@ -23,22 +23,20 @@ public class RadialMenu : MonoBehaviour
     private int selectedInt = 0;
 
     public float turnTime = 1f;
+    public float rushMultiplier = 5f;
     private Color _selectedColor = new Color(1f, 1f, 1f, 0.75f);
     private Color _unselectedColor = new Color(1f, 1f, 1f, 0.5f);
 
-    private void Start()
-    {
+    private void Start() {
         lineCircle = Instantiate(lineCircle, transform);
         lineCircle.transform.localScale = new Vector3(radius, radius) * 0.5f;
     }
 
-    public void SpawnButtons()
-    {
+    public void SpawnButtons() {
         StartCoroutine(AnimateButtons());
     }
 
-    IEnumerator AnimateButtons()
-    {
+    IEnumerator AnimateButtons() {
         //determine size each element must take up
         var stepLength = 360f / Data.Elements.Length;
 
@@ -50,8 +48,7 @@ public class RadialMenu : MonoBehaviour
         NewButtonPositions = new float[Data.Elements.Length];
         CurrentButtonPositions = new float[Data.Elements.Length];
 
-        for (int i = 0; i < Data.Elements.Length; i++)
-        {
+        for (int i = 0; i < Data.Elements.Length; i++) {
             RadialButton newButton = Instantiate(buttonPrefab) as RadialButton;
             float angle = stepLength * i + 90;
             Buttons[i] = newButton;
@@ -74,35 +71,28 @@ public class RadialMenu : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (Buttons[Buttons.Length - 1] == null) return;
         //differentiate the selected element
-        for (int i = 0; i < Data.Elements.Length; i++)
-        {
-            if (i == selectedInt)
-            {
+        for (int i = 0; i < Data.Elements.Length; i++) {
+            if (i == selectedInt) {
                 //Debug.Log(selectedInt);
                 Buttons[i].Background.color = _selectedColor;
             }
-            else
-            {
+            else {
                 Buttons[i].Background.color = _unselectedColor;
             }
         }
     }
 
-    public RadialMenu NextRing(RadialRing radRing)
-    {
+    public RadialMenu NextRing(RadialRing radRing) {
         Path = Data.Elements[selectedInt].Name;
         if (radRing != null) { return null; }
-        if (Data.NextRing != null)
-        {
+        if (Data.NextRing != null) {
             var newSubRing = Instantiate(gameObject, transform.parent).GetComponent<RadialMenu>();
             newSubRing.Parent = this;
 
-            for (var j = 0; j < newSubRing.transform.childCount; j++)
-            {
+            for (var j = 0; j < newSubRing.transform.childCount; j++) {
                 Destroy(newSubRing.transform.GetChild(j).gameObject);
             }
 
@@ -112,8 +102,7 @@ public class RadialMenu : MonoBehaviour
 
             return newSubRing;
         }
-        else
-        {
+        else {
             //callback?.Invoke(path);
             return null;
         }
@@ -122,94 +111,83 @@ public class RadialMenu : MonoBehaviour
 
 
     bool coroutineRunning = false;
-    bool coroutineSprinting = false;
-    public void TurnMenu(int tileAmount)
-    {
+    bool coroutineRushing = false;
+    public void TurnMenu(int tileAmount) {
 
         var stepLength = 360f / Data.Elements.Length;
 
         if (Buttons[Buttons.Length - 1] == null) return;
 
-        if (!coroutineRunning)
-        {
-            coroutineSprinting = coroutineRunning;
+        if (!coroutineRunning) {
+            coroutineRushing = coroutineRunning;
             selectedInt += tileAmount;
 
-            while (selectedInt < 0 || selectedInt > Buttons.Length - 1)
-            {
+            while (selectedInt < 0 || selectedInt > Buttons.Length - 1) {
                 selectedInt = (selectedInt > Buttons.Length - 1) ? selectedInt - Buttons.Length : selectedInt + Buttons.Length;
             }
 
-            for (int i = 0; i < Buttons.Length; i++)
-            {
+            for (int i = 0; i < Buttons.Length; i++) {
                 NewButtonPositions[i] = NormalizeAngle(stepLength * (i + selectedInt) + 90);
             }
             StartCoroutine(TurnAnimation());
         }
-        else
-        {
-            coroutineSprinting= coroutineRunning;
-            //StopCoroutine(TurnAnimation());
+        else {
+            coroutineRushing = coroutineRunning;
             //ResetButtonPositions();
         }
     }
 
     private float speedMultiplier = 1f;
-    private float accelerationFactor = 0.5f;
-    IEnumerator TurnAnimation()
-    {
+    IEnumerator TurnAnimation() {
         float timer = 0f;
         coroutineRunning = true;
 
         float currentTurnTime = turnTime;
+        float completion = 0f;
 
-        while (timer < currentTurnTime)
-        {
-            if (coroutineSprinting)
-            {
+        while (completion < 1) {
+            if (coroutineRushing) {
                 //currentTurnTime *= accelerationFactor;
-                speedMultiplier = 2f;
+                speedMultiplier = rushMultiplier;
             }
 
             timer += Time.deltaTime * speedMultiplier;
-            float completion = timer / currentTurnTime;
+            completion = timer / currentTurnTime;
+            completion *= speedMultiplier;
 
-            for (int i = 0; i < Buttons.Length; i++)
-            {
+            for (int i = 0; i < Buttons.Length; i++) {
                 if (Buttons[i] == null) continue;
 
                 float currentAngle = CurrentButtonPositions[i];
                 float targetAngle = NewButtonPositions[i];
 
-                float exponentialCompletion = Mathf.Pow(completion , speedMultiplier);
-
-                float newAngle = Mathf.LerpAngle(currentAngle, targetAngle, exponentialCompletion);
+                float newAngle = Mathf.LerpAngle(currentAngle, targetAngle, completion);
 
                 Buttons[i].transform.localPosition = Helper.PolarToCart(newAngle, radius);
             }
             yield return new WaitForFixedUpdate();
         }
-        for (int i = 0; i < Buttons.Length; i++)
-        {
+        for (int i = 0; i < Buttons.Length; i++) {
             Buttons[i].transform.localPosition = Helper.PolarToCart(NewButtonPositions[i], radius);
             CurrentButtonPositions[i] = NewButtonPositions[i];
         }
-        coroutineRunning = false;
+        coroutineRushing = coroutineRunning = false;
         speedMultiplier = 1f;
     }
 
-    void ResetButtonPositions()
-    {
-        coroutineRunning = false;
+    void ResetButtonPositions() {
+        StopCoroutine(TurnAnimation());
+        coroutineRushing = coroutineRunning = false;
 
-        for (int i = 0; i < Buttons.Length; i++)
-        {
+        for (int i = 0; i < Buttons.Length; i++) {
             Buttons[i].transform.localPosition = Helper.PolarToCart(NewButtonPositions[i], radius);
             CurrentButtonPositions[i] = NewButtonPositions[i];
         }
-        coroutineRunning = false;
     }
 
     private float NormalizeAngle(float a) => (a + 360) % 360f;
 
+    private void OnDisable() {
+        ResetButtonPositions();
+    }
 }

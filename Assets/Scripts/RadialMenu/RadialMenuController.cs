@@ -83,7 +83,7 @@ public class RadialMenuController : Interactable
                 menuLayers[index].NextRing(menuLayers[index].Data);
                 paths[index] = menuLayers[index].Path;
                 menuLayers[index + 1].gameObject.SetActive(true);
-                menuLayers[index + 1].TurnMenu(0);
+                //menuLayers[index + 1].TurnMenu(0);
             }
             index++;
             return null;
