@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RadialMenuController : Interactable
+public class RadialMenuController : MonoBehaviour
 {
     public RadialMenu RadialMenuPrefab;
     protected RadialMenu RadialMenuInstance;
@@ -29,7 +29,7 @@ public class RadialMenuController : Interactable
         }
     }
 
-    override public void Update()
+    public void Update()
     {
         Debug.Log(MenuLayers?.Count ?? 0);
     }
