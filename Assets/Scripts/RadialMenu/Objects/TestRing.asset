@@ -12,5 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3272dfc0b851cd048bce06800476591e, type: 3}
   m_Name: TestRing
   m_EditorClassIdentifier: 
-  Elements: []
-  NextRing: {fileID: 0}
+  Elements:
+  - {fileID: 11400000, guid: 823573d01faa69743b2202b9265d9c81, type: 2}
+  - {fileID: 11400000, guid: 823573d01faa69743b2202b9265d9c81, type: 2}
+  NextRing: {fileID: 11400000}
+  MenuName: 
+  Radius: 0
+  GapWidthDegree: 0
+  LineCircle: {fileID: 0}
+  Path: 
+  TurnTime: 0
+  RushMultiplier: 0

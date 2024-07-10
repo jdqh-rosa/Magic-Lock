@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class RadialMenu : MonoBehaviour
 {
     public RadialRing Data;
@@ -28,6 +29,13 @@ public class RadialMenu : MonoBehaviour
     private Color _unselectedColor = new Color(1f, 1f, 1f, 0.5f);
 
     private void Start() {
+        if (Buttons == null || Buttons.Length == 0)
+        {
+            if (Data.Elements.Length >= 0)
+            {
+                SpawnButtons();
+            }
+        }
     }
 
     // Update is called once per frame
@@ -48,6 +56,7 @@ public class RadialMenu : MonoBehaviour
 
     public void SpawnButtons() {
         gameObject.SetActive(true);
+        if (Buttons != null) return;
         lineCircle = Instantiate(lineCircle, transform);
         lineCircle.transform.localScale = new Vector3(radius, radius) * 0.5f;
         StartCoroutine(AnimateButtons());
@@ -98,21 +107,12 @@ public class RadialMenu : MonoBehaviour
             var newSubRing = Instantiate(gameObject, transform.parent).GetComponent<RadialMenu>();
             newSubRing.Parent = this;
 
-            for (var j = 0; j < newSubRing.transform.childCount; j++) {
-                Destroy(newSubRing.transform.GetChild(j).gameObject);
-            }
-
-            //newSubRing.Data = Data.NextRing;
-            //newSubRing.radius = radius + 100f;
-            //newSubRing.callback = callback;
-
             return newSubRing;
         }
         else {
             //callback?.Invoke(path);
             return null;
         }
-        //gameObject.SetActive(false);
     }
 
 

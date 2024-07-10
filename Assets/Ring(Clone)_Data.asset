@@ -9,9 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a15e8518eab2ed4885d542af4284c40, type: 3}
-  m_Name: Test
+  m_Script: {fileID: 11500000, guid: 2e95a4f3516284d46ae1e9aa7061a8e8, type: 3}
+  m_Name: Ring(Clone)_Data
   m_EditorClassIdentifier: 
-  Name: Test
-  Circle: {fileID: 21300000, guid: 6648aa06e56312040ac91897635fa479, type: 3}
-  Icon: {fileID: 21300000, guid: afe8f210dad04e345b2090139dc002c1, type: 3}
+  menuName: Ring(Clone)
+  radius: 100
+  GapWidthDegree: 1
+  lineCircle: {fileID: 0}
+  Path: 
+  turnTime: 5
+  rushMultiplier: 3

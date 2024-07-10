@@ -198,12 +198,11 @@ MonoBehaviour:
   title: RMC
   options: []
   RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
-  menuLayers: []
-  createBool: 1
-  paths:
-  - 
-  - 
-  - 
+  MenuLayers: []
+  Index: 0
+  createBool: 0
+  Paths: []
+  LayerRadiusDifference: 100
 --- !u!1 &488089314
 GameObject:
   m_ObjectHideFlags: 0
@@ -375,12 +374,11 @@ MonoBehaviour:
   title: 
   options: []
   RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
-  menuLayers: []
+  MenuLayers: []
+  Index: 0
   createBool: 0
-  paths:
-  - 
-  - 
-  - 
+  Paths: []
+  LayerRadiusDifference: 100
 --- !u!4 &1064022651
 Transform:
   m_ObjectHideFlags: 0

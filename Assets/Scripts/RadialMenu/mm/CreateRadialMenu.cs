@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-[CreateAssetMenu(fileName = "CreateMenu", menuName = "RadialMenu/Menu", order = 2)]
+//[CreateAssetMenu(fileName = "CreateMenu", menuName = "RadialMenu/Menu", order = 2)]
 public class CreateRadialMenu : ScriptableObject
 {
     public RadialRing ringTemplate;
@@ -22,11 +22,5 @@ public class CreateRadialMenu : ScriptableObject
                 }
             }
         }
-    }
-
-
-    void Update()
-    {
-        
     }
 }
