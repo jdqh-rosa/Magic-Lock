@@ -78,7 +78,7 @@ public class RadialMenuControllerEditorWindow : EditorWindow
         EditorGUILayout.Space();
 
         // Menu Management Buttons
-        if (GUILayout.Button("Create Menu"))
+        if (GUILayout.Button("Create Menu Layer"))
         {
             controller.CreateMenu();
         }

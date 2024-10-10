@@ -27,11 +27,12 @@ public class RadialMenuController : MonoBehaviour
         {
             Paths = new List<string>();
         }
+        LogLayerCount();
     }
 
     public void Update()
     {
-        Debug.Log(MenuLayers?.Count ?? 0);
+        
     }
 
     public void CreateMenu(RadialMenu radialMenu = null)
@@ -127,6 +128,7 @@ public class RadialMenuController : MonoBehaviour
         {
             CreateMenu(menu);
         }
+        LogLayerCount();
     }
 
     public void TurnMenuRight()
@@ -201,11 +203,16 @@ public class RadialMenuController : MonoBehaviour
 
     public bool MenuCheck()
     {
+        LogLayerCount();
         if (MenuLayers == null || MenuLayers.Count == 0 || MenuLayers[Index] == null || MenuLayers.Count <= Index)
         {
             Debug.LogWarning("Menu layers have not been created. Please create the menu first.");
             return false;
         }
         return true;
+    }
+
+    void LogLayerCount(){
+        Debug.Log(MenuLayers?.Count ?? 0);
     }
 }
