@@ -36,6 +36,7 @@ public class RadialMenu : MonoBehaviour
                 SpawnButtons();
             }
         }
+        DebugSelected();
     }
 
     // Update is called once per frame
@@ -51,7 +52,7 @@ public class RadialMenu : MonoBehaviour
                 Buttons[i].Background.color = _unselectedColor;
             }
         }
-        Debug.Log($"Selected Element: {Data.Elements[selectedInt]},,, Selected Button: {Buttons[selectedInt]}");
+        
     }
 
     public void SpawnButtons() {
@@ -102,6 +103,8 @@ public class RadialMenu : MonoBehaviour
 
         if (createNew == false) { return null; }
 
+        DebugSelected();
+
         if (Data.NextRing != null) {
 
             var newSubRing = Instantiate(gameObject, transform.parent).GetComponent<RadialMenu>();
@@ -140,6 +143,7 @@ public class RadialMenu : MonoBehaviour
         else {
             coroutineRushing = coroutineRunning;
         }
+        DebugSelected();
     }
 
     private float speedMultiplier = 1f;
@@ -203,5 +207,10 @@ public class RadialMenu : MonoBehaviour
         }
         DestroyImmediate(lineCircle);
         DestroyImmediate(this);
+    }
+
+    private void DebugSelected()
+    {
+        Debug.Log($"Selected Element: {Data.Elements[selectedInt]},,, Selected Button: {Buttons[selectedInt]}");
     }
 }

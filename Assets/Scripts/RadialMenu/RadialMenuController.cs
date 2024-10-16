@@ -19,7 +19,7 @@ public class RadialMenuController : MonoBehaviour
     private void Start()
     {
         // Initialization if needed
-        if (MenuLayers == null)
+        if (!MenuCheck())
         {
             MenuLayers = new List<RadialMenu>();
         }
@@ -213,6 +213,6 @@ public class RadialMenuController : MonoBehaviour
     }
 
     void LogLayerCount(){
-        Debug.Log(MenuLayers?.Count ?? 0);
+        Debug.Log($"Layer Count: {MenuLayers?.Count ?? 0}");
     }
 }
