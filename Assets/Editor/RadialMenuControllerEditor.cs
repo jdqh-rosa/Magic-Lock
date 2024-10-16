@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(RadialMenuController))]
+[CustomEditor(typeof(RadialMenuController), true)]
 public class RadialMenuControllerEditor : Editor
 {
     private RadialMenuController controller;
@@ -22,7 +22,6 @@ public class RadialMenuControllerEditor : Editor
             Debug.LogError("Target is not a RadialMenuController");
             return;
         }
-
         // Additional initialization logic if needed
     }
 
@@ -54,10 +53,13 @@ public class RadialMenuControllerEditorWindow : EditorWindow
 {
     private RadialMenuController controller;
     private Vector2 scrollPos;
+    private SerializedObject serializedController;
 
     public void SetController(RadialMenuController controller)
     {
         this.controller = controller;
+        // Initialize SerializedObject for the controller to access its serialized properties
+        serializedController = new SerializedObject(controller);
     }
 
     private void OnGUI()
@@ -71,48 +73,54 @@ public class RadialMenuControllerEditorWindow : EditorWindow
         EditorGUILayout.LabelField("Radial Menu Controller Editor", EditorStyles.boldLabel);
         EditorGUILayout.Space();
 
-        // Radial Menu Controller Properties
-        controller.RadialMenuPrefab = (RadialMenu)EditorGUILayout.ObjectField("Radial Menu Prefab", controller.RadialMenuPrefab, typeof(RadialMenu), true);
-        controller.CreateBool = EditorGUILayout.Toggle("Create Bool", controller.CreateBool);
+        // Begin to observe serialized changes
+        serializedController.Update();
 
-        EditorGUILayout.Space();
+        // Radial Menu Controller Properties
+        EditorGUILayout.PropertyField(serializedController.FindProperty("RadialMenuPrefab"), new GUIContent("Radial Menu Prefab"));
+        EditorGUILayout.PropertyField(serializedController.FindProperty("CreateBool"), new GUIContent("Create Bool"));
 
         // Menu Management Buttons
         if (GUILayout.Button("Create Menu Layer"))
         {
             controller.CreateMenu();
-        }
-        if (GUILayout.Button("Spawn Menu"))
-        {
             controller.SpawnMenu();
         }
-        if (GUILayout.Button("Destroy Menu"))
-        {
-            controller.DestroyMenu();
-        }
 
-        EditorGUILayout.Space();
+        if (controller.MenuLayers != null && controller.MenuLayers.Count > 0)
+        {
+            if (GUILayout.Button("Spawn Menu"))
+            {
+                controller.SpawnMenu();
+            }
+            if (GUILayout.Button("Destroy Menu"))
+            {
+                controller.DestroyMenu();
+            }
 
-        // Menu Control Buttons
-        EditorGUILayout.LabelField("Menu Controls", EditorStyles.boldLabel);
-        if (GUILayout.Button("Turn Left"))
-        {
-            controller.TurnMenuLeft();
-        }
-        if (GUILayout.Button("Turn Right"))
-        {
-            controller.TurnMenuRight();
-        }
-        if (GUILayout.Button("Next Ring"))
-        {
-            controller.NextRing();
-        }
-        if (GUILayout.Button("Previous Ring"))
-        {
-            controller.PreviousRing();
-        }
+            EditorGUILayout.Space();
 
-        EditorGUILayout.Space();
+            // Menu Control Buttons
+            EditorGUILayout.LabelField("Menu Controls", EditorStyles.boldLabel);
+            if (GUILayout.Button("Turn Left"))
+            {
+                controller.TurnMenuLeft();
+            }
+            if (GUILayout.Button("Turn Right"))
+            {
+                controller.TurnMenuRight();
+            }
+            if (GUILayout.Button("Next Ring"))
+            {
+                controller.NextRing();
+            }
+            if (GUILayout.Button("Previous Ring"))
+            {
+                controller.PreviousRing();
+            }
+
+            EditorGUILayout.Space();
+        }
 
         // Menu Layers
         EditorGUILayout.LabelField("Menu Layers", EditorStyles.boldLabel);
@@ -121,21 +129,36 @@ public class RadialMenuControllerEditorWindow : EditorWindow
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             for (int i = 0; i < controller.MenuLayers.Count; i++)
             {
-                EditorGUILayout.BeginVertical(GUI.skin.box);
-                EditorGUILayout.LabelField($"Layer {i + 1}", EditorStyles.boldLabel);
-                controller.MenuLayers[i].GapWidthDegree = EditorGUILayout.FloatField("Gap Width Degree", controller.MenuLayers[i].GapWidthDegree);
-                controller.MenuLayers[i].radius = EditorGUILayout.FloatField("Radius", controller.MenuLayers[i].radius);
+                //EditorGUILayout.BeginVertical(GUI.skin.box);
+                SerializedProperty layerProperty = serializedController.FindProperty($"MenuLayers.Array.data[{i}]");
+                
+                // Foldout using the serialized property's `isExpanded` field
+                //layerProperty.isExpanded = EditorGUILayout.Foldout(layerProperty.isExpanded, $"Layer {i + 1}", EditorStyles.boldLabel);
 
-                if (GUILayout.Button($"Edit Layer {i + 1}"))
+                //if (layerProperty.isExpanded)
+                if(true)
                 {
-                    ShowLayerEditor(controller.MenuLayers[i], i);
-                }
-                if (GUILayout.Button("Save Layer"))
-                {
-                    SaveLayer(controller.MenuLayers[i], i);
-                }
+                    controller.MenuLayers[i] = (RadialMenu)EditorGUILayout.ObjectField($"Element {i + 1}", controller.MenuLayers[i], typeof(RadialMenu), true);
+                    controller.MenuLayers[i].GapWidthDegree = EditorGUILayout.FloatField("Gap Width Degree", controller.MenuLayers[i].GapWidthDegree);
+                    controller.MenuLayers[i].radius = EditorGUILayout.FloatField("Radius", controller.MenuLayers[i].radius);
 
-                EditorGUILayout.EndVertical();
+                    // Edit individual fields inside the layer
+                    //EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("GapWidthDegree"), new GUIContent("Gap Width Degree"));
+                    //EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("radius"), new GUIContent("Radius"));
+
+
+                    if (GUILayout.Button($"Edit Layer {i + 1}"))
+                    {
+                        ShowLayerEditor(controller.MenuLayers[i], i);
+                    }
+                    if (GUILayout.Button("Save Layer"))
+                    {
+                        SaveLayer(controller.MenuLayers[i], i);
+                    }
+
+
+                }
+                //EditorGUILayout.EndVertical();
                 EditorGUILayout.Space();
             }
             EditorGUILayout.EndScrollView();
@@ -144,6 +167,9 @@ public class RadialMenuControllerEditorWindow : EditorWindow
         {
             EditorGUILayout.LabelField("No menu layers available.");
         }
+
+        // Apply changes to the serialized object
+        serializedController.ApplyModifiedProperties();
 
         if (GUI.changed)
         {
@@ -164,7 +190,7 @@ public class RadialMenuControllerEditorWindow : EditorWindow
             Debug.LogWarning("No current layer to save.");
             return;
         }
-        
+
         RadialMenu currentLayer = controller.MenuLayers[controller.Index];
         RadialRing data = ScriptableObject.CreateInstance<RadialRing>();
         data.CopyFrom(currentLayer);

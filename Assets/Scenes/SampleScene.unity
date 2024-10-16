@@ -453,6 +453,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: RadialMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 3754007020488405563, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
+      propertyPath: Paths.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754007020488405563, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
+      propertyPath: MenuLayers.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754007020488405563, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
+      propertyPath: MenuLayers.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754007020488405563, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
+      propertyPath: MenuLayers.Array.data[1]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8636394791990543519, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
