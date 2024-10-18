@@ -69,6 +69,10 @@ public class RadialMenuControllerEditorWindow : EditorWindow
             EditorGUILayout.LabelField("No Radial Menu Controller assigned.");
             return;
         }
+        else if (serializedController == null)
+        {
+            SetController(controller);
+        }
 
         EditorGUILayout.LabelField("Radial Menu Controller Editor", EditorStyles.boldLabel);
         EditorGUILayout.Space();
@@ -126,17 +130,20 @@ public class RadialMenuControllerEditorWindow : EditorWindow
         EditorGUILayout.LabelField("Menu Layers", EditorStyles.boldLabel);
         if (controller.MenuLayers != null && controller.MenuLayers.Count > 0)
         {
+
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             for (int i = 0; i < controller.MenuLayers.Count; i++)
             {
+                if (controller.MenuLayers[i] == null) return;
+
                 //EditorGUILayout.BeginVertical(GUI.skin.box);
                 SerializedProperty layerProperty = serializedController.FindProperty($"MenuLayers.Array.data[{i}]");
-                
+
                 // Foldout using the serialized property's `isExpanded` field
                 //layerProperty.isExpanded = EditorGUILayout.Foldout(layerProperty.isExpanded, $"Layer {i + 1}", EditorStyles.boldLabel);
 
                 //if (layerProperty.isExpanded)
-                if(true)
+                if (true)
                 {
                     controller.MenuLayers[i] = (RadialMenu)EditorGUILayout.ObjectField($"Element {i + 1}", controller.MenuLayers[i], typeof(RadialMenu), true);
                     controller.MenuLayers[i].GapWidthDegree = EditorGUILayout.FloatField("Gap Width Degree", controller.MenuLayers[i].GapWidthDegree);
