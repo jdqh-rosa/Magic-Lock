@@ -10,9 +10,9 @@ public class RadialMenuController : MonoBehaviour
     public List<RadialMenu> MenuLayers;
     public int Index = 0;
 
-    public bool CreateBool = false;
+    public bool PremadeBool = false;
 
-    public List<string> Paths;
+    public List<string> Paths = new List<string>();
 
     public float LayerRadiusDifference = 100f;
 
@@ -23,10 +23,14 @@ public class RadialMenuController : MonoBehaviour
         {
             MenuLayers = new List<RadialMenu>();
         }
-        if (Paths == null)
+        else if(PremadeBool)
         {
-            Paths = new List<string>();
+            MenuLayers[Index].Init();
         }
+        //if (Paths == null)
+        //{
+        //    Paths = new List<string>();
+        //}
         LogLayerCount();
     }
 
@@ -60,7 +64,7 @@ public class RadialMenuController : MonoBehaviour
 
         MenuLayers.Add(RadialMenuInstance);
 
-        if (Index == MenuLayers.Count - 1 && CreateBool)
+        if (Index == MenuLayers.Count - 1 && PremadeBool)
         {
             MenuLayers[Index].SpawnButtons();
         }
@@ -90,7 +94,7 @@ public class RadialMenuController : MonoBehaviour
             RespawnMenu();
         }
         // Otherwise, if createBool is true, create a new menu
-        else if (CreateBool)
+        else if (PremadeBool)
         {
             CreateMenu();
         }
@@ -149,7 +153,7 @@ public class RadialMenuController : MonoBehaviour
 
         var next = MenuLayers[Index].Data.NextRing;
 
-        if ((next != null && CreateBool) || (Index + 1 < MenuLayers.Count && MenuLayers[Index + 1] != null))
+        if ((next != null && PremadeBool) || (Index + 1 < MenuLayers.Count && MenuLayers[Index + 1] != null))
         {
             Debug.Log(string.Format("index: {0}, count: {1}", Index + 1, MenuLayers.Count));
 

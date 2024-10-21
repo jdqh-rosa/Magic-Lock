@@ -33,8 +33,7 @@ public class RadialRing : ScriptableObject
         Elements = new RadialElement[radialMenu.Data.Elements.Length];
         Array.Copy(radialMenu.Data.Elements, Elements, radialMenu.Data.Elements.Length);
 
-        if (radialMenu.Data.NextRing != null)
-        {
+        if (radialMenu.Data.NextRing != null){
             //NextRing = ScriptableObject.CreateInstance<RadialRing>();
             //NextRing.CopyFrom(radialMenu.Data.NextRing);
         }

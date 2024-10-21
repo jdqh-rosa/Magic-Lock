@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3272dfc0b851cd048bce06800476591e, type: 3}
+  m_Name: ThirdLayer
+  m_EditorClassIdentifier: 
+  Elements:
+  - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
+  - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
+  - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
+  NextRing: {fileID: 0}
+  MenuName: 3rd
+  Radius: 0
+  GapWidthDegree: 1
+  LineCircle: {fileID: 6634903730378418066, guid: f44a331a8d81cd048b3913af836582b2, type: 3}
+  Path: 
+  TurnTime: 10
+  RushMultiplier: 5
