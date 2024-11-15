@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: FirstLayer
   m_EditorClassIdentifier: 
   Elements:
-  - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  ElementsList:
+  - {fileID: 0}
+  - {fileID: 0}
   NextRing: {fileID: 11400000, guid: 67ab6733cc3c12e49bc4b4680419de52, type: 2}
   MenuName: 1st
   Radius: 0

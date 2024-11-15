@@ -6,8 +6,7 @@ public class RadialMenuController : MonoBehaviour
     public RadialMenu RadialMenuPrefab;
     protected RadialMenu RadialMenuInstance;
 
-    [SerializeField]
-    public List<RadialMenu> MenuLayers;
+    [SerializeField] public List<RadialMenu> MenuLayers;
     public int Index = 0;
 
     public bool PremadeBool = false;
@@ -23,10 +22,11 @@ public class RadialMenuController : MonoBehaviour
         {
             MenuLayers = new List<RadialMenu>();
         }
-        else if(PremadeBool)
+        else if (PremadeBool)
         {
             MenuLayers[Index].Init();
         }
+
         //if (Paths == null)
         //{
         //    Paths = new List<string>();
@@ -36,15 +36,15 @@ public class RadialMenuController : MonoBehaviour
 
     public void Update()
     {
-        
     }
 
     public void CreateMenu(RadialMenu radialMenu = null)
     {
-        if (radialMenu == null)
+        if (!radialMenu)
         {
             radialMenu = RadialMenuPrefab;
         }
+
         if (MenuLayers == null)
         {
             MenuLayers = new List<RadialMenu>();
@@ -55,10 +55,10 @@ public class RadialMenuController : MonoBehaviour
 
         if (MenuLayers.Count > 0)
         {
-            if (MenuLayers[MenuLayers.Count - 1] == null) return;
-            MenuLayers[MenuLayers.Count - 1].Data.NextRing = RadialMenuInstance.Data;
+            if (!MenuLayers[^1]) return;
+            MenuLayers[^1].Data.NextRing = RadialMenuInstance.Data;
             RadialMenuInstance.Data = MenuLayers[Index].Data.NextRing;
-            RadialMenuInstance.radius = MenuLayers[MenuLayers.Count - 1].radius + LayerRadiusDifference;
+            RadialMenuInstance.radius = MenuLayers[^1].radius + LayerRadiusDifference;
             RadialMenuInstance.callback = MenuLayers[Index].callback;
         }
 
@@ -76,17 +76,20 @@ public class RadialMenuController : MonoBehaviour
 
         if (Paths.Count <= Index)
         {
-            Paths.Add(MenuLayers[Index].Path);
+            Paths.Add(MenuLayers[Index].path);
         }
         else
         {
-            Paths[Index] = MenuLayers[Index].Path;
+            Paths[Index] = MenuLayers[Index].path;
         }
     }
 
     public void SpawnMenu()
     {
-        if (!MenuCheck()) { return; }
+        if (!MenuCheck())
+        {
+            return;
+        }
 
         // If there are already multiple layers, respawn the menu
         if (MenuLayers.Count > 1)
@@ -106,7 +109,10 @@ public class RadialMenuController : MonoBehaviour
 
     public void DestroyMenu()
     {
-        if (!MenuCheck()) { return; }
+        if (!MenuCheck())
+        {
+            return;
+        }
 
         foreach (var layer in MenuLayers)
         {
@@ -120,42 +126,57 @@ public class RadialMenuController : MonoBehaviour
 
     public void RespawnMenu()
     {
-        List<RadialMenu> tempLayers= new List<RadialMenu>();
+        List<RadialMenu> tempLayers = new List<RadialMenu>();
 
         foreach (RadialMenu menu in MenuLayers)
         {
             tempLayers.Add(menu);
         }
+
         DestroyMenu();
 
-        foreach(RadialMenu menu in tempLayers)
+        foreach (RadialMenu menu in tempLayers)
         {
             CreateMenu(menu);
         }
+
         LogLayerCount();
     }
 
     public void TurnMenuRight()
     {
-        if (!MenuCheck()) { return; }
+        if (!MenuCheck())
+        {
+            return;
+        }
+
         MenuLayers[Index].TurnMenu(-1);
     }
 
     public void TurnMenuLeft()
     {
-        if (!MenuCheck()) { return; }
+        if (!MenuCheck())
+        {
+            return;
+        }
+
         MenuLayers[Index].TurnMenu(1);
     }
 
     public string NextRing()
     {
-        if (!MenuCheck()) { return null; }
+        if (!MenuCheck())
+        {
+            return null;
+        }
 
         var next = MenuLayers[Index].Data.NextRing;
 
-        if ((next != null && PremadeBool) || (Index + 1 < MenuLayers.Count && MenuLayers[Index + 1] != null))
+        if ((next && PremadeBool) || (Index + 1 < MenuLayers.Count && MenuLayers[Index + 1]))
         {
-            Debug.Log(string.Format("index: {0}, count: {1}", Index + 1, MenuLayers.Count));
+#if UNITY_EDITOR
+            Debug.Log($"index: {Index + 1}, count: {MenuLayers.Count}", this);
+#endif
 
             if (Index + 1 == MenuLayers.Count)
             {
@@ -166,12 +187,13 @@ public class RadialMenuController : MonoBehaviour
                 MenuLayers[Index].NextRing(false);
                 if (Paths.Count - 1 >= Index)
                 {
-                    Paths[Index] = MenuLayers[Index].Path;
+                    Paths[Index] = MenuLayers[Index].path;
                 }
                 else
                 {
-                    Paths.Add(MenuLayers[Index].Path);
+                    Paths.Add(MenuLayers[Index].path);
                 }
+
                 MenuLayers[Index + 1].gameObject.SetActive(true);
             }
 
@@ -183,23 +205,31 @@ public class RadialMenuController : MonoBehaviour
             MenuLayers[Index].NextRing(false);
             if (Paths.Count - 1 >= Index)
             {
-                Paths[Index] = MenuLayers[Index].Path;
+                Paths[Index] = MenuLayers[Index].path;
             }
             else
             {
-                Paths.Add(MenuLayers[Index].Path);
+                Paths.Add(MenuLayers[Index].path);
             }
 
             string pathSummary = string.Join(", ", Paths);
-            Debug.Log(pathSummary);
 
-            return MenuLayers[Index].Path;
+#if UNITY_EDITOR
+            Debug.Log(pathSummary, this);
+#endif
+
+
+            return MenuLayers[Index].path;
         }
     }
 
     public void PreviousRing()
     {
-        if (!MenuCheck()) { return; }
+        if (!MenuCheck())
+        {
+            return;
+        }
+
         if (Index <= 0) return;
         MenuLayers[Index].gameObject.SetActive(false);
         --Index;
@@ -208,15 +238,21 @@ public class RadialMenuController : MonoBehaviour
     public bool MenuCheck()
     {
         LogLayerCount();
-        if (MenuLayers == null || MenuLayers.Count == 0 || MenuLayers[Index] == null || MenuLayers.Count <= Index)
+        if (MenuLayers == null || MenuLayers.Count == 0 || !MenuLayers[Index] || MenuLayers.Count <= Index)
         {
-            Debug.LogWarning("Menu layers have not been created. Please create the menu first.");
+#if UNITY_EDITOR
+            Debug.LogWarning("Menu layers have not been created. Please create the menu first.", this);
+#endif
             return false;
         }
+
         return true;
     }
 
-    void LogLayerCount(){
-        Debug.Log($"Layer Count: {MenuLayers?.Count ?? 0}");
+    void LogLayerCount()
+    {
+#if UNITY_EDITOR
+        Debug.Log($"Layer Count: {MenuLayers?.Count ?? 0}", this);
+#endif
     }
 }
