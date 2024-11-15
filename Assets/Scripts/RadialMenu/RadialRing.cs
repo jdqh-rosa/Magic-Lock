@@ -5,8 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "RadialRing", menuName = "RadialMenu/Ring", order = 1)]
 public class RadialRing : ScriptableObject
 {
-    public RadialElement[] Elements;
-    public List<RadialElement> ElementsList = new List<RadialElement>();
+    //public RadialElement[] Elements;
+    public List<RadialElement> Elements = new List<RadialElement>();
     public RadialRing NextRing;
     public string MenuName;
     public float Radius;
@@ -32,17 +32,17 @@ public class RadialRing : ScriptableObject
         TurnTime = radialMenu.turnTime;
         RushMultiplier = radialMenu.rushMultiplier;
 
-        Elements = new RadialElement[radialMenu.Data.Elements.Length];
-        Array.Copy(radialMenu.Data.Elements, Elements, radialMenu.Data.Elements.Length);
+        //Elements = new RadialElement[radialMenu.Data.Elements.Length];
+        //Array.Copy(radialMenu.Data.Elements, Elements, radialMenu.Data.Elements.Length);
         
-        ElementsList = radialMenu.Data.ElementsList;
+        Elements = radialMenu.Data.Elements;
 
         if (radialMenu.Data.NextRing){
             //NextRing = ScriptableObject.CreateInstance<RadialRing>();
             //NextRing.CopyFrom(radialMenu.Data.NextRing);
         }
     }
-
+    /*
     public void AddElement(RadialElement radialElement)
     {
         RingCleanArray();
@@ -68,19 +68,20 @@ public class RadialRing : ScriptableObject
         }
         Elements = new RadialElement[length];
         Array.Copy(newElements, 0, Elements, 0, length);
-    }
+    }*/
+    
     private void RingCleanList()
     {
         List<RadialElement> _cleanList = new List<RadialElement>();
-        foreach (RadialElement radialElement in ElementsList) {
+        foreach (RadialElement radialElement in Elements) {
             if (!radialElement) _cleanList.Add(radialElement); 
         }
 
         foreach (var element in _cleanList) {
-            ElementsList.Remove(element);
+            Elements.Remove(element);
         }
     }
-
+    /*
     public RadialMenu ToRadialMenu()
     {
         var radialMenu = new RadialMenu
@@ -105,5 +106,5 @@ public class RadialRing : ScriptableObject
         };
 
         return radialMenu;
-    }
+    }*/
 }

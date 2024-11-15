@@ -33,7 +33,7 @@ public class RadialMenu : MonoBehaviour
     public void Init()
     {
         if (Buttons == null || Buttons.Length == 0) {
-            if (Data.Elements.Length >= 0) {
+            if (Data.Elements.Count >= 0) {
                 SpawnButtons();
             }
         }
@@ -46,7 +46,7 @@ public class RadialMenu : MonoBehaviour
     {
         if (Buttons == null || Buttons.Length == 0 || !Buttons[Buttons.Length - 1]) return;
         //Differentiate the selected element
-        for (int i = 0; i < Data.Elements.Length; i++) {
+        for (int i = 0; i < Data.Elements.Count; i++) {
             if (i == selectedInt) {
                 Buttons[i].Background.color = _selectedColor;
             }
@@ -71,18 +71,18 @@ public class RadialMenu : MonoBehaviour
     IEnumerator AnimateButtons()
     {
         //determine size each element must take up
-        var stepLength = 360f / Data.Elements.Length;
+        var stepLength = 360f / Data.Elements.Count;
 
         //get distance between Icon and Background
         var iconDist = Vector3.Distance(buttonPrefab.Icon.transform.position,
             buttonPrefab.Background.transform.position);
 
         //position the elements
-        Buttons = new RadialButton[Data.Elements.Length];
-        NewButtonPositions = new float[Data.Elements.Length];
-        CurrentButtonPositions = new float[Data.Elements.Length];
+        Buttons = new RadialButton[Data.Elements.Count];
+        NewButtonPositions = new float[Data.Elements.Count];
+        CurrentButtonPositions = new float[Data.Elements.Count];
 
-        for (int i = 0; i < Data.Elements.Length; i++) {
+        for (int i = 0; i < Data.Elements.Count; i++) {
             if (!Data.Elements[i]) continue;
             RadialButton newButton = Instantiate(buttonPrefab);
             newButton.name = $"Button:{Data.Elements[i].name}";
@@ -137,7 +137,7 @@ public class RadialMenu : MonoBehaviour
 
     public void TurnMenu(int tileAmount)
     {
-        var stepLength = 360f / Data.Elements.Length;
+        var stepLength = 360f / Data.Elements.Count;
 
         if (!Buttons[Buttons.Length - 1]) return;
 
