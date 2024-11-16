@@ -15,6 +15,7 @@ MonoBehaviour:
   Elements:
   - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
   - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
+  - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
   NextRing: {fileID: 11400000, guid: 69f4624c75af24d4fbbdeefd9fb38a08, type: 2}
   MenuName: 2nd
   Radius: 0

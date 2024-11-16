@@ -29,6 +29,8 @@ public class RadialMenu : MonoBehaviour
     public float rushMultiplier = 5f;
     private Color _selectedColor = new Color(1f, 1f, 1f, 0.75f);
     private Color _unselectedColor = new Color(1f, 1f, 1f, 0.5f);
+    
+    public bool initialized = false;
 
     public void Init()
     {
@@ -37,7 +39,7 @@ public class RadialMenu : MonoBehaviour
                 SpawnButtons();
             }
         }
-
+        initialized = true;
         DebugSelected();
     }
 

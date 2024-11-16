@@ -52,3 +52,4 @@ MonoBehaviour:
   path: 
   turnTime: 1
   rushMultiplier: 5
+  initialized: 0
