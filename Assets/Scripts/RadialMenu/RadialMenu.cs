@@ -29,7 +29,7 @@ public class RadialMenu : MonoBehaviour
     public float rushMultiplier = 5f;
     private Color _selectedColor = new Color(1f, 1f, 1f, 0.75f);
     private Color _unselectedColor = new Color(1f, 1f, 1f, 0.5f);
-    
+
     public bool initialized = false;
 
     public void Init()
@@ -39,6 +39,7 @@ public class RadialMenu : MonoBehaviour
                 SpawnButtons();
             }
         }
+
         initialized = true;
         DebugSelected();
     }
@@ -176,23 +177,25 @@ public class RadialMenu : MonoBehaviour
         float currentTurnTime = turnTime;
         float completion = 0f;
 
-        while (completion < 1) {
+        while (timer < currentTurnTime) {
+            // Adjust speed dynamically if rushing.
             if (coroutineRushing) {
                 speedMultiplier = rushMultiplier;
             }
 
-            timer += Time.deltaTime * speedMultiplier;
-            completion = timer / currentTurnTime;
-            completion *= speedMultiplier;
+            // Increment timer and calculate completion percentage.
+            timer += Time.fixedDeltaTime * speedMultiplier;
+            completion =  Mathf.Clamp01(timer / currentTurnTime);
 
+            // Update each button's position.
             for (int i = 0; i < Buttons.Length; i++) {
                 if (!Buttons[i]) continue;
 
                 float currentAngle = CurrentButtonPositions[i];
                 float targetAngle = NewButtonPositions[i];
 
+                // Interpolate and update position.
                 float newAngle = Mathf.LerpAngle(currentAngle, targetAngle, completion);
-
                 Buttons[i].transform.localPosition = Helper.PolarToCart(newAngle, radius);
             }
 

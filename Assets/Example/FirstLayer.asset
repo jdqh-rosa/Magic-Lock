@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3272dfc0b851cd048bce06800476591e, type: 3}
-  m_Name: ThirdLayer
+  m_Name: FirstLayer
   m_EditorClassIdentifier: 
   Elements:
   - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
   - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
   - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
-  - {fileID: 11400000, guid: 328306e3caaa4ef45a7f56a654d800a4, type: 2}
-  NextRing: {fileID: 0}
-  MenuName: 3rd
+  NextRing: {fileID: 11400000, guid: 67ab6733cc3c12e49bc4b4680419de52, type: 2}
+  MenuName: 1st
   Radius: 0
   GapWidthDegree: 1
   LineCircle: {fileID: 6634903730378418066, guid: f44a331a8d81cd048b3913af836582b2, type: 3}
   Path: 
-  TurnTime: 10
-  RushMultiplier: 5
+  TurnTime: 5
+  RushMultiplier: 3

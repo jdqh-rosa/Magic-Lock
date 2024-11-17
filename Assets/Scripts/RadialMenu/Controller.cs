@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
-    //Menu
-    public RadialMenu RadialMenuPrefab;
 
     [HideInInspector]
     public ControllerMode Mode;
@@ -16,8 +14,6 @@ public class Controller : MonoBehaviour
     void Start()
     {
         SetMode(ControllerMode.Cast);
-        //radialMenuController = new RadialMenuController();
-        //radialMenuController.RadialMenuPrefab = RadialMenuPrefab;
         radialMenuController.SpawnMenu();
 
     }
@@ -25,6 +21,7 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(Mode.ToString());
         if (Mode == ControllerMode.Cast) {
 
             if (Input.GetKeyDown(KeyCode.Space)) {
