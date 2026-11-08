@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 0
@@ -181,13 +178,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e48959bced7dd47addab842bbda20f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RadialMenuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
-  MenuCanvas: {fileID: 0}
-  MenuLayers: []
-  Index: 0
-  PremadeBool: 0
-  Paths: []
-  LayerRadiusDifference: 100
+  menuPrefab: {fileID: 6375874495043528406, guid: b95dacc61e38ad541900518bc4fdd759, type: 3}
+  rootRing: {fileID: 0}
+  menuCanvas: {fileID: 0}
+  openOnStart: 0
+  closeOnSelect: 0
+  onPathSelected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &488089314
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,11 +450,11 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3754007020488405563, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
-      propertyPath: MenuLayers.Array.data[0]
+      propertyPath: 'MenuLayers.Array.data[0]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3754007020488405563, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
-      propertyPath: MenuLayers.Array.data[1]
+      propertyPath: 'MenuLayers.Array.data[1]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8636394791990543519, guid: 3801dc517ff745746b1fcaf69dcb9238, type: 3}
@@ -512,6 +510,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1235156089065755285, guid: 928dcd2fbb3f59948827d1dbecb30d62, type: 3}
+      propertyPath: menuPrefab
+      value: 
+      objectReference: {fileID: 3602457708616068455, guid: 96414a216adaf94419788b69fc5d5084, type: 3}
     - target: {fileID: 7158540308945639201, guid: 928dcd2fbb3f59948827d1dbecb30d62, type: 3}
       propertyPath: m_Camera
       value: 

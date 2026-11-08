@@ -1,213 +1,188 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(RadialMenuController), true)]
-public class RadialMenuControllerEditor : Editor
+namespace MagicLock.Radial.Editor
 {
-    private RadialMenuController controller;
-
-    [MenuItem("Window/Radial Menu Controller")]
-    static void Init()
+    [CustomEditor(typeof(RadialMenuController), true)]
+    public class RadialMenuControllerEditor : UnityEditor.Editor
     {
-        RadialMenuControllerEditorWindow window =
-            (RadialMenuControllerEditorWindow)EditorWindow.GetWindow<RadialMenuControllerEditorWindow>();
-        window.titleContent = new GUIContent("Radial Menu Controller Editor");
-        window.Show();
-    }
-
-    private void OnEnable()
-    {
-        controller = target as RadialMenuController;
-        if (!controller) {
-            Debug.LogError("Target is not a RadialMenuController");
-            return;
-        }
-
-        if (controller.PremadeBool) {
-            
-        }
-        // Additional initialization logic if needed
-    }
-
-    public override void OnInspectorGUI()
-    {
-        if (!controller) {
-            EditorGUILayout.LabelField("No Radial Menu Controller assigned.");
-            return;
-        }
-
-        if (GUILayout.Button("Open Radial Menu Editor")) {
-            ShowRadialMenuEditor();
-        }
-
-        DrawDefaultInspector();
-    }
-
-    private void ShowRadialMenuEditor()
-    {
-        RadialMenuControllerEditorWindow window =
-            (RadialMenuControllerEditorWindow)EditorWindow.GetWindow<RadialMenuControllerEditorWindow>();
-        window.SetController(controller);
-        window.Show();
-    }
-}
-
-public class RadialMenuControllerEditorWindow : EditorWindow
-{
-    private RadialMenuController controller;
-    private Vector2 scrollPos;
-    private SerializedObject serializedController;
-
-    public void SetController(RadialMenuController pController)
-    {
-        this.controller = pController;
-        // Initialize SerializedObject for the controller to access its serialized properties
-        serializedController = new SerializedObject(this.controller);
-    }
-
-    private void OnGUI()
-    {
-        if (!controller) {
-            EditorGUILayout.LabelField("No Radial Menu Controller assigned.");
-            return;
-        }
-        else if (serializedController == null) {
-            SetController(controller);
-        }
-
-        EditorGUILayout.LabelField("Radial Menu Controller Editor", EditorStyles.boldLabel);
-        EditorGUILayout.Space();
-
-        // Begin to observe serialized changes
-        serializedController.Update();
-
-        // Radial Menu Controller Properties
-        EditorGUILayout.PropertyField(serializedController.FindProperty("RadialMenuPrefab"),
-            new GUIContent("Radial Menu Prefab"));
-        EditorGUILayout.PropertyField(serializedController.FindProperty("PremadeBool"), new GUIContent("Premade Bool"));
-
-        // Menu Management Buttons
-        if (GUILayout.Button("Create Menu Layer")) {
-            controller.CreateMenu();
-            controller.SpawnMenu();
-        }
-
-        if (controller.MenuLayers != null && controller.MenuLayers.Count > 0) {
-            if (GUILayout.Button("Spawn Menu")) {
-                controller.SpawnMenu();
+        public override void OnInspectorGUI()
+        {
+            if (GUILayout.Button("Open Radial Menu Editor")) {
+                RadialMenuControllerEditorWindow.Open((RadialMenuController)target);
             }
 
-            if (GUILayout.Button("Destroy Menu (Instance)")) {
-                controller.DestroyMenu();
+            DrawDefaultInspector();
+        }
+    }
+
+    /// <summary>
+    /// Authoring view of a controller's ring chain (edits the ring assets) plus Play Mode controls for previewing.
+    /// </summary>
+    public class RadialMenuControllerEditorWindow : EditorWindow
+    {
+        [SerializeField] private RadialMenuController controller;
+        private SerializedObject _serializedController;
+        private Vector2 _scrollPos;
+
+        [MenuItem("Window/Radial Menu Controller")]
+        private static void OpenFromMenu() =>
+            Open(Selection.activeGameObject ? Selection.activeGameObject.GetComponent<RadialMenuController>() : null);
+
+        public static void Open(RadialMenuController target)
+        {
+            var window = GetWindow<RadialMenuControllerEditorWindow>();
+            window.titleContent = new GUIContent("Radial Menu Controller");
+            if (target) window.SetController(target);
+            window.Show();
+        }
+
+        public void SetController(RadialMenuController pController)
+        {
+            controller = pController;
+            _serializedController = null;
+        }
+
+        private void OnSelectionChange()
+        {
+            var selected = Selection.activeGameObject
+                ? Selection.activeGameObject.GetComponent<RadialMenuController>()
+                : null;
+            if (selected) {
+                SetController(selected);
+                Repaint();
             }
+        }
+
+        private void OnInspectorUpdate()
+        {
+            if (Application.isPlaying) Repaint();
+        }
+
+        private void OnGUI()
+        {
+            if (!controller) {
+                EditorGUILayout.HelpBox("Select a GameObject with a RadialMenuController.", MessageType.Info);
+                return;
+            }
+
+            if (_serializedController == null || _serializedController.targetObject != controller) {
+                _serializedController = new SerializedObject(controller);
+            }
+
+            _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+
+            EditorGUILayout.LabelField(controller.name, EditorStyles.boldLabel);
+            _serializedController.Update();
+            EditorGUILayout.PropertyField(_serializedController.FindProperty(nameof(RadialMenuController.menuPrefab)));
+            EditorGUILayout.PropertyField(_serializedController.FindProperty(nameof(RadialMenuController.rootRing)));
+            _serializedController.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
-
-            // Menu Control Buttons
-            EditorGUILayout.LabelField("Menu Controls", EditorStyles.boldLabel);
-            if (GUILayout.Button("Turn Left")) {
-                controller.TurnMenuLeft();
-            }
-
-            if (GUILayout.Button("Turn Right")) {
-                controller.TurnMenuRight();
-            }
-
-            if (GUILayout.Button("Next Ring")) {
-                controller.NextRing();
-            }
-
-            if (GUILayout.Button("Previous Ring")) {
-                controller.PreviousRing();
-            }
-
+            DrawRings();
             EditorGUILayout.Space();
-        }
-
-        // Menu Layers
-        EditorGUILayout.LabelField("Menu Layers", EditorStyles.boldLabel);
-        if (controller.MenuLayers != null && controller.MenuLayers.Count > 0) {
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-            for (int i = 0; i < controller.MenuLayers.Count; i++) {
-                if (!controller.MenuLayers[i]) return;
-
-                //EditorGUILayout.BeginVertical(GUI.skin.box);
-                SerializedProperty layerProperty = serializedController.FindProperty($"MenuLayers.Array.data[{i}]");
-
-                // Foldout using the serialized property's `isExpanded` field
-                //layerProperty.isExpanded = EditorGUILayout.Foldout(layerProperty.isExpanded, $"Layer {i + 1}", EditorStyles.boldLabel);
-
-                //if (layerProperty.isExpanded)
-                if (true) {
-                    controller.MenuLayers[i] = (RadialMenu)EditorGUILayout.ObjectField($"Element {i + 1}",
-                        controller.MenuLayers[i], typeof(RadialMenu), true);
-                    controller.MenuLayers[i].GapWidthDegree = EditorGUILayout.FloatField("Gap Width Degree",
-                        controller.MenuLayers[i].GapWidthDegree);
-                    controller.MenuLayers[i].radius =
-                        EditorGUILayout.FloatField("Radius", controller.MenuLayers[i].radius);
-
-                    // Edit individual fields inside the layer
-                    //EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("GapWidthDegree"), new GUIContent("Gap Width Degree"));
-                    //EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("radius"), new GUIContent("Radius"));
-
-
-                    if (GUILayout.Button($"Edit Layer {i + 1}")) {
-                        ShowLayerEditor(controller.MenuLayers[i], i);
-                    }
-
-                    if (GUILayout.Button("Save Layer")) {
-                        SaveLayer(controller.MenuLayers[i], i);
-                    }
-                }
-
-                //EditorGUILayout.EndVertical();
-                EditorGUILayout.Space();
-            }
+            DrawPlayControls();
 
             EditorGUILayout.EndScrollView();
         }
-        else {
-            EditorGUILayout.LabelField("No menu layers available.");
+
+        private void DrawRings()
+        {
+            EditorGUILayout.LabelField("Rings", EditorStyles.boldLabel);
+
+            RadialRing root = controller.RootRing;
+            if (!root) {
+                EditorGUILayout.HelpBox("No root ring. Assign one, or give the menu prefab a Data ring.", MessageType.Info);
+                if (GUILayout.Button("Create Root Ring...")) {
+                    RadialRing created = CreateRingAsset("RootRing");
+                    if (created) {
+                        Undo.RecordObject(controller, "Assign Root Ring");
+                        controller.rootRing = created;
+                        EditorUtility.SetDirty(controller);
+                    }
+                }
+
+                return;
+            }
+
+            List<RadialRing> rings = root.Chain().ToList();
+            for (int i = 0; i < rings.Count; i++) {
+                RadialRing ring = rings[i];
+                using (new EditorGUILayout.HorizontalScope()) {
+                    EditorGUILayout.LabelField($"Layer {i + 1}", GUILayout.Width(60));
+                    using (new EditorGUI.DisabledScope(true)) {
+                        EditorGUILayout.ObjectField(ring, typeof(RadialRing), false);
+                    }
+
+                    EditorGUILayout.LabelField($"{ring.Elements.Count(e => e)} elements", GUILayout.Width(80));
+                    if (GUILayout.Button("Edit", GUILayout.Width(50))) {
+                        var window = GetWindow<RadialMenuLayerEditorWindow>(false, $"Layer {i + 1}");
+                        window.SetRing(ring, i);
+                        window.Show();
+                    }
+                }
+            }
+
+            RadialRing last = rings[rings.Count - 1];
+            if (last.NextRing) {
+                EditorGUILayout.HelpBox($"\"{last.name}\" links back into the chain. Fix its Next Ring.", MessageType.Warning);
+            }
+            else if (GUILayout.Button("Add Ring...")) {
+                RadialRing created = CreateRingAsset($"Layer{rings.Count + 1}Ring");
+                if (created) {
+                    Undo.RecordObject(last, "Add Radial Ring");
+                    last.NextRing = created;
+                    EditorUtility.SetDirty(last);
+                }
+            }
         }
 
-        // Apply changes to the serialized object
-        serializedController.ApplyModifiedProperties();
+        private void DrawPlayControls()
+        {
+            EditorGUILayout.LabelField("Preview", EditorStyles.boldLabel);
+            if (!Application.isPlaying) {
+                EditorGUILayout.HelpBox("Enter Play Mode to preview the menu.", MessageType.Info);
+                return;
+            }
 
-        if (GUI.changed) {
-            EditorUtility.SetDirty(controller);
+            using (new EditorGUILayout.HorizontalScope()) {
+                if (GUILayout.Button(controller.IsOpen ? "Close" : "Open")) controller.Toggle();
+                if (GUILayout.Button("Rebuild")) controller.Rebuild();
+            }
+
+            using (new EditorGUI.DisabledScope(!controller.IsOpen)) {
+                using (new EditorGUILayout.HorizontalScope()) {
+                    if (GUILayout.Button("Turn Left")) controller.TurnLeft();
+                    if (GUILayout.Button("Turn Right")) controller.TurnRight();
+                }
+
+                using (new EditorGUILayout.HorizontalScope()) {
+                    if (GUILayout.Button("Back")) controller.Back();
+                    if (GUILayout.Button("Confirm")) controller.Confirm();
+                }
+            }
+
+            if (controller.IsOpen) {
+                RadialMenu layer = controller.CurrentLayer;
+                EditorGUILayout.LabelField("Layer", $"{controller.LayerIndex + 1} / {controller.Layers.Count}");
+                EditorGUILayout.LabelField("Highlighted",
+                    layer && layer.SelectedElement ? layer.SelectedElement.DisplayName : "-");
+                EditorGUILayout.LabelField("Path so far", RadialMenuController.JoinNames(controller.CurrentPath));
+            }
         }
-    }
 
-    private void ShowLayerEditor(RadialMenu layer, int layerIndex)
-    {
-        RadialMenuLayerEditorWindow window =
-            (RadialMenuLayerEditorWindow)EditorWindow.GetWindow<RadialMenuLayerEditorWindow>(false,
-                $"Layer {layerIndex + 1} Editor");
-        window.SetLayer(layer, layerIndex);
-        window.Show();
-    }
+        private static RadialRing CreateRingAsset(string defaultName)
+        {
+            string path = EditorUtility.SaveFilePanelInProject("Create Radial Ring", defaultName, "asset",
+                "Choose where to save the new ring.");
+            if (string.IsNullOrEmpty(path)) return null;
 
-    private void SaveLayer(RadialMenu layer, int layerIndex)
-    {
-        if (!controller.MenuCheck()) {
-#if UNITY_EDITOR
-            Debug.LogWarning("No current layer to save.", this);
-#endif
-            return;
-        }
-
-        RadialMenu currentLayer = controller.MenuLayers[controller.Index];
-        RadialRing data = ScriptableObject.CreateInstance<RadialRing>();
-        data.CopyFrom(currentLayer);
-
-        string path = EditorUtility.SaveFilePanelInProject("Save Radial Menu Data", $"{currentLayer.name}_Data",
-            "asset", "Please enter a file name to save the radial menu data.");
-        if (!string.IsNullOrEmpty(path)) {
-            AssetDatabase.CreateAsset(data, path);
+            var ring = CreateInstance<RadialRing>();
+            AssetDatabase.CreateAsset(ring, path);
             AssetDatabase.SaveAssets();
-#if UNITY_EDITOR
-            Debug.Log($"Saved Radial Menu Data to {path}", this);
-#endif
+            return ring;
         }
     }
 }

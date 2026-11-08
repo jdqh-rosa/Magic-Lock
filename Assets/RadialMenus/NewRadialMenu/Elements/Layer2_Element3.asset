@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a15e8518eab2ed4885d542af4284c40, type: 3}
+  m_Name: Layer2_Element3
+  m_EditorClassIdentifier: MagicLock.RadialMenu::MagicLock.Radial.RadialElement
+  Name: 
+  Circle: {fileID: 0}
+  Icon: {fileID: 0}
+  overrides:
+    buttonPrefab:
+      enabled: 0
+      value: {fileID: 0}
+    buttonScale:
+      enabled: 0
+      value: 0
+    selectedScale:
+      enabled: 0
+      value: 0
+    selectedColor:
+      enabled: 0
+      value: {r: 0, g: 0, b: 0, a: 0}
+    unselectedColor:
+      enabled: 0
+      value: {r: 0, g: 0, b: 0, a: 0}
+    iconColor:
+      enabled: 0
+      value: {r: 0, g: 0, b: 0, a: 0}
+    selectedIconColor:
+      enabled: 0
+      value: {r: 0, g: 0, b: 0, a: 0}

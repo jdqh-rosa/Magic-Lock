@@ -2,254 +2,277 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-[ExecuteInEditMode]
-public class RadialMenu : MonoBehaviour
+namespace MagicLock.Radial
 {
-    public RadialRing Data;
-    public RadialButton buttonPrefab;
-    public float GapWidthDegree = 1f;
-    public float radius = 100f;
-
-    public GameObject lineCircle;
-
-    public Action<string> callback;
-    protected RadialButton[] Buttons;
-    protected float[] NewButtonPositions;
-    protected float[] CurrentButtonPositions;
-    protected RadialMenu Parent;
-
-    [FormerlySerializedAs("Path")] [HideInInspector]
-    public string path;
-
-    private int selectedInt = 0;
-
-    public float turnTime = 1f;
-    public float rushMultiplier = 5f;
-    private Color _selectedColor = new Color(1f, 1f, 1f, 0.75f);
-    private Color _unselectedColor = new Color(1f, 1f, 1f, 0.5f);
-
-    public bool initialized = false;
-
-    public void Init()
+    /// <summary>
+    /// One ring of a radial menu. Spawns a <see cref="RadialButton"/> per element of its <see cref="RadialRing"/>
+    /// and rotates them so the selected element sits at <see cref="RadialMenuStyle.selectedAngle"/>.
+    /// Visuals come from <see cref="style"/>, overridden by the ring and then by each element.
+    /// All state here is per instance; the ring and element assets are only read.
+    /// </summary>
+    public class RadialMenu : MonoBehaviour
     {
-        if (Buttons == null || Buttons.Length == 0) {
-            if (Data.Elements.Count >= 0) {
-                SpawnButtons();
-            }
+        [Tooltip("Ring shown by this menu. A RadialMenuController replaces it per layer through Bind().")]
+        public RadialRing Data;
+
+        [Tooltip("Menu-wide look and feel. Rings and elements can override parts of it.")]
+        public RadialMenuStyle style = new RadialMenuStyle();
+
+        /// <summary>Raised when turning changes the selected element.</summary>
+        public event Action<RadialElement> SelectionChanged;
+
+        private readonly List<RadialElement> _elements = new List<RadialElement>();
+        private readonly List<RadialElementVisual> _visuals = new List<RadialElementVisual>();
+        private readonly List<RadialButton> _buttons = new List<RadialButton>();
+        private float[] _startAngles = Array.Empty<float>();
+        private float[] _currentAngles = Array.Empty<float>();
+        private float[] _targetAngles = Array.Empty<float>();
+        private RadialMenuStyle _ringStyle;
+        private GameObject _lineCircleInstance;
+        private Coroutine _turnRoutine;
+        private Coroutine _spawnRoutine;
+        private float _turnTimer;
+        private bool _rushing;
+        private bool _built;
+        private int _selected;
+        private int _depth;
+
+        public bool IsBuilt => _built;
+        public int Depth => _depth;
+        public int SelectedIndex => _selected;
+        public RadialElement SelectedElement => _selected < _elements.Count ? _elements[_selected] : null;
+
+        /// <summary>The elements that got a button, in display order.</summary>
+        public IReadOnlyList<RadialElement> Elements => _elements;
+
+        /// <summary><see cref="style"/> with this ring's overrides applied.</summary>
+        public RadialMenuStyle EffectiveStyle => style.With(Data ? Data.overrides : null);
+
+        public float Radius => style.RadiusFor(_depth, Data ? Data.overrides : null);
+
+        /// <summary>
+        /// Use <paramref name="ring"/> as layer <paramref name="depth"/> (0 = innermost). Clears existing buttons;
+        /// they are rebuilt on the next Show().
+        /// </summary>
+        public void Bind(RadialRing ring, int depth = 0)
+        {
+            Clear();
+            Data = ring;
+            _depth = depth;
         }
 
-        initialized = true;
-        DebugSelected();
-    }
+        /// <summary>Activate the menu, building its buttons if needed.</summary>
+        public void Show()
+        {
+            gameObject.SetActive(true);
+            if (!_built) Build();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Buttons == null || Buttons.Length == 0 || !Buttons[Buttons.Length - 1]) return;
-        //Differentiate the selected element
-        for (int i = 0; i < Data.Elements.Count; i++) {
-            if (i == selectedInt) {
-                Buttons[i].Background.color = _selectedColor;
+        public void Hide() => gameObject.SetActive(false);
+
+        /// <summary>Destroy the spawned buttons and reset the selection. The ring data is kept.</summary>
+        public void Clear()
+        {
+            StopRoutines();
+
+            foreach (var button in _buttons) {
+                if (button) Helper.DestroySafe(button.gameObject);
+            }
+
+            _buttons.Clear();
+            _elements.Clear();
+            _visuals.Clear();
+            Helper.DestroySafe(_lineCircleInstance);
+            _lineCircleInstance = null;
+            _startAngles = _currentAngles = _targetAngles = Array.Empty<float>();
+            _selected = 0;
+            _built = false;
+        }
+
+        /// <summary>Rotate by <paramref name="steps"/> elements. Positive selects the next element.</summary>
+        public void Turn(int steps)
+        {
+            int count = _elements.Count;
+            if (!_built || count == 0 || steps == 0) return;
+
+            int previous = _selected;
+            _selected = ((_selected + steps) % count + count) % count;
+
+            for (int i = 0; i < count; i++) {
+                _startAngles[i] = _currentAngles[i];
+                _targetAngles[i] = AngleFor(i);
+            }
+
+            RefreshVisuals();
+
+            if (!isActiveAndEnabled) {
+                SnapToTarget();
             }
             else {
-                Buttons[i].Background.color = _unselectedColor;
-            }
-        }
-    }
-
-    public void SpawnButtons()
-    {
-        gameObject.SetActive(true);
-        if (Buttons != null) return;
-        if (lineCircle) {
-            lineCircle = Instantiate(lineCircle, transform);
-            lineCircle.transform.localScale = new Vector3(radius, radius) * 0.5f;
-        }
-
-        StartCoroutine(AnimateButtons());
-    }
-
-    IEnumerator AnimateButtons()
-    {
-        //determine size each element must take up
-        var stepLength = 360f / Data.Elements.Count;
-
-        //get distance between Icon and Background
-        var iconDist = Vector3.Distance(buttonPrefab.Icon.transform.position,
-            buttonPrefab.Background.transform.position);
-
-        //position the elements
-        Buttons = new RadialButton[Data.Elements.Count];
-        NewButtonPositions = new float[Data.Elements.Count];
-        CurrentButtonPositions = new float[Data.Elements.Count];
-
-        for (int i = 0; i < Data.Elements.Count; i++) {
-            if (!Data.Elements[i]) continue;
-            RadialButton newButton = Instantiate(buttonPrefab);
-            newButton.name = $"Button:{Data.Elements[i].name}";
-            float angle = stepLength * i + 90;
-            Buttons[i] = newButton;
-            newButton.transform.SetParent(transform, false);
-            newButton.transform.localPosition = Helper.PolarToCart(angle, radius);
-            CurrentButtonPositions[i] = angle;
-
-            //set background circle
-            Buttons[i].Background.sprite = Data.Elements[i].Circle;
-
-            //set icon
-            Buttons[i].Icon.transform.localPosition = Buttons[i].Background.transform.localPosition +
-                                                      Quaternion.AngleAxis(i * stepLength, Vector3.forward) *
-                                                      Vector3.up * iconDist;
-            Buttons[i].Icon.sprite = Data.Elements[i].Icon;
-            Buttons[i].Icon.sprite.name = Data.Elements[i].Icon.name;
-
-            Buttons[i].Anim();
-            newButton.Anim();
-            yield return new WaitForSeconds(0.06f);
-        }
-    }
-
-    public RadialMenu NextRing(bool createNew = true)
-    {
-        path = Data.Elements[selectedInt].Name;
-        coroutineRushing = coroutineRunning;
-
-        if (createNew == false) {
-            return null;
-        }
-
-        DebugSelected();
-
-        if (Data.NextRing) {
-            var newSubRing = Instantiate(gameObject, transform.parent).GetComponent<RadialMenu>();
-            newSubRing.Parent = this;
-
-            return newSubRing;
-        }
-        else {
-            //callback?.Invoke(path);
-            return null;
-        }
-    }
-
-
-    bool coroutineRunning = false;
-    bool coroutineRushing = false;
-
-    public void TurnMenu(int tileAmount)
-    {
-        var stepLength = 360f / Data.Elements.Count;
-
-        if (!Buttons[Buttons.Length - 1]) return;
-
-        if (!coroutineRunning) {
-            coroutineRushing = coroutineRunning;
-            selectedInt += tileAmount;
-
-            while (selectedInt < 0 || selectedInt > Buttons.Length - 1) {
-                selectedInt = (selectedInt > Buttons.Length - 1)
-                    ? selectedInt - Buttons.Length
-                    : selectedInt + Buttons.Length;
+                // A turn arriving mid-animation retargets from where the buttons are now and speeds up.
+                _rushing = _turnRoutine != null;
+                _turnTimer = 0f;
+                if (_turnRoutine == null) _turnRoutine = StartCoroutine(TurnAnimation());
             }
 
-            for (int i = 0; i < Buttons.Length; i++) {
-                NewButtonPositions[i] = NormalizeAngle(stepLength * (i - selectedInt) + 90);
+            if (_selected != previous) SelectionChanged?.Invoke(SelectedElement);
+        }
+
+        private void Build()
+        {
+            Clear();
+            _built = true;
+            _ringStyle = EffectiveStyle;
+            float radius = Radius;
+
+            if (Data) {
+                foreach (var element in Data.Elements) {
+                    if (!element) continue;
+
+                    RadialElementVisual visual = RadialElementVisual.Resolve(_ringStyle, element);
+                    if (!visual.buttonPrefab) {
+                        Debug.LogWarning($"{name}: no button prefab for element '{element.name}'. " +
+                                         "Set one on the menu style, the ring or the element.", this);
+                        continue;
+                    }
+
+                    _elements.Add(element);
+                    _visuals.Add(visual);
+                }
             }
 
-            StartCoroutine(TurnAnimation());
-        }
-        else {
-            coroutineRushing = coroutineRunning;
-        }
+            int count = _elements.Count;
+            _startAngles = new float[count];
+            _currentAngles = new float[count];
+            _targetAngles = new float[count];
 
-        DebugSelected();
-    }
-
-    private float speedMultiplier = 1f;
-
-    IEnumerator TurnAnimation()
-    {
-        float timer = 0f;
-        coroutineRunning = true;
-
-        float currentTurnTime = turnTime;
-        float completion = 0f;
-
-        while (timer < currentTurnTime) {
-            // Adjust speed dynamically if rushing.
-            if (coroutineRushing) {
-                speedMultiplier = rushMultiplier;
+            if (_ringStyle.lineCircle) {
+                _lineCircleInstance = Instantiate(_ringStyle.lineCircle, transform);
+                _lineCircleInstance.transform.localScale = new Vector3(radius, radius) * 0.5f;
             }
 
-            // Increment timer and calculate completion percentage.
-            timer += Time.fixedDeltaTime * speedMultiplier;
-            completion =  Mathf.Clamp01(timer / currentTurnTime);
+            if (count == 0) return;
 
-            // Update each button's position.
-            for (int i = 0; i < Buttons.Length; i++) {
-                if (!Buttons[i]) continue;
+            float step = 360f / count;
+            for (int i = 0; i < count; i++) {
+                RadialElement element = _elements[i];
+                RadialElementVisual visual = _visuals[i];
+                RadialButton prefab = visual.buttonPrefab;
 
-                float currentAngle = CurrentButtonPositions[i];
-                float targetAngle = NewButtonPositions[i];
+                RadialButton button = Instantiate(prefab, transform, false);
+                button.name = $"Button:{element.name}";
 
-                // Interpolate and update position.
-                float newAngle = Mathf.LerpAngle(currentAngle, targetAngle, completion);
-                Buttons[i].transform.localPosition = Helper.PolarToCart(newAngle, radius);
+                float angle = AngleFor(i);
+                _startAngles[i] = _currentAngles[i] = _targetAngles[i] = angle;
+                button.transform.localPosition = Helper.PolarToCart(angle, radius);
+
+                if (button.Background && visual.background) button.Background.sprite = visual.background;
+                if (button.Icon) {
+                    button.Icon.sprite = visual.icon;
+                    button.Icon.enabled = visual.icon;
+
+                    if (button.Background) {
+                        float iconDist = Vector3.Distance(prefab.Icon.transform.position,
+                            prefab.Background.transform.position);
+                        button.Icon.transform.localPosition = button.Background.transform.localPosition +
+                                                              Quaternion.AngleAxis(i * step, Vector3.forward) *
+                                                              Vector3.up * iconDist;
+                    }
+                }
+
+                _buttons.Add(button);
             }
 
-            yield return new WaitForFixedUpdate();
+            RefreshVisuals();
+            foreach (var button in _buttons) button.HideForPopIn();
+            _spawnRoutine = StartCoroutine(PopIn());
         }
 
-        for (int i = 0; i < Buttons.Length; i++) {
-            Buttons[i].transform.localPosition = Helper.PolarToCart(NewButtonPositions[i], radius);
-            CurrentButtonPositions[i] = NewButtonPositions[i];
+        private IEnumerator PopIn()
+        {
+            foreach (var button in _buttons) {
+                button.Anim(_ringStyle.popInSpeed);
+                if (_ringStyle.spawnStagger > 0f) yield return new WaitForSeconds(_ringStyle.spawnStagger);
+            }
+
+            _spawnRoutine = null;
         }
 
-        coroutineRushing = coroutineRunning = false;
-        speedMultiplier = 1f;
-    }
+        private IEnumerator TurnAnimation()
+        {
+            float turnTime = _ringStyle.turnTime;
+            while (_turnTimer < turnTime) {
+                _turnTimer += Time.deltaTime * (_rushing ? _ringStyle.rushMultiplier : 1f);
+                float t = Mathf.Clamp01(_turnTimer / turnTime);
 
-    void ResetButtonPositions()
-    {
-        StopCoroutine(TurnAnimation());
-        coroutineRushing = coroutineRunning = false;
+                for (int i = 0; i < _currentAngles.Length; i++) {
+                    _currentAngles[i] = Mathf.LerpAngle(_startAngles[i], _targetAngles[i], t);
+                }
 
-        for (int i = 0; i < Buttons.Length; i++) {
-            Buttons[i].transform.localPosition = Helper.PolarToCart(NewButtonPositions[i], radius);
-            CurrentButtonPositions[i] = NewButtonPositions[i];
-        }
-    }
+                ApplyAngles();
+                yield return null;
+            }
 
-    private float NormalizeAngle(float a) => (a + 360) % 360f;
-
-    private void OnDisable()
-    {
-        if (coroutineRunning) {
-            ResetButtonPositions();
-        }
-    }
-
-    public void DestroyMenu()
-    {
-        foreach (var button in Buttons) {
-            DestroyImmediate(button.gameObject);
+            _turnRoutine = null;
+            SnapToTarget();
         }
 
-        DestroyImmediate(lineCircle);
-        DestroyImmediate(this);
-    }
+        private float AngleFor(int index)
+        {
+            float step = 360f / _elements.Count * (index - _selected);
+            return NormalizeAngle(_ringStyle.selectedAngle + (_ringStyle.clockwise ? -step : step));
+        }
 
-    private void DebugSelected()
-    {
-#if UNITY_EDITOR
-        Debug.Log($"Selected Element: {Data.Elements[selectedInt]},,, Selected Button: {Buttons[selectedInt]}", this);
-#endif
-    }
+        private static float NormalizeAngle(float a) => (a % 360f + 360f) % 360f;
 
-    public void AddDataRing(RadialRing ring)
-    {
-        Data = ring;
+        private void SnapToTarget()
+        {
+            Array.Copy(_targetAngles, _currentAngles, _targetAngles.Length);
+            ApplyAngles();
+            _rushing = false;
+        }
+
+        private void ApplyAngles()
+        {
+            float radius = Radius;
+            for (int i = 0; i < _buttons.Count; i++) {
+                _buttons[i].transform.localPosition = Helper.PolarToCart(_currentAngles[i], radius);
+            }
+        }
+
+        private void RefreshVisuals()
+        {
+            for (int i = 0; i < _buttons.Count; i++) {
+                RadialButton button = _buttons[i];
+                RadialElementVisual visual = _visuals[i];
+                bool selected = i == _selected;
+
+                if (button.Background) button.Background.color = selected ? visual.selectedColor : visual.unselectedColor;
+                if (button.Icon) button.Icon.color = selected ? visual.selectedIconColor : visual.iconColor;
+                button.SetScale(visual.scale * (selected ? visual.selectedScale : 1f));
+            }
+        }
+
+        private void StopRoutines()
+        {
+            if (_turnRoutine != null) StopCoroutine(_turnRoutine);
+            if (_spawnRoutine != null) StopCoroutine(_spawnRoutine);
+            _turnRoutine = _spawnRoutine = null;
+        }
+
+        private void OnDisable()
+        {
+            // Coroutines die with the GameObject; finish their work so the menu is correct when shown again.
+            bool wasSpawning = _spawnRoutine != null;
+            StopRoutines();
+            if (wasSpawning) {
+                foreach (var button in _buttons) {
+                    if (button) button.Anim(0f);
+                }
+            }
+
+            SnapToTarget();
+        }
     }
 }

@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4893693949428224490
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8446069099326242584}
+  - component: {fileID: 3602457708616068455}
+  m_Layer: 0
+  m_Name: NewRadialMenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8446069099326242584
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4893693949428224490}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3602457708616068455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4893693949428224490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b20a3faf61ae44494c1ff3f249b408, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MagicLock.RadialMenu::MagicLock.Radial.RadialMenu
+  Data: {fileID: 11400000, guid: 00590a2de9faae14582e0c908a3ef0d7, type: 2}
+  style:
+    radius: 200
+    layerRadiusStep: 100
+    selectedAngle: 90
+    clockwise: 0
+    buttonPrefab: {fileID: 8426322464565684634, guid: 23f72852da1e5b147b8a0ff5896dbc3b, type: 3}
+    defaultBackground: {fileID: 0}
+    buttonScale: 1
+    selectedScale: 1
+    lineCircle: {fileID: 6634903730378418066, guid: f44a331a8d81cd048b3913af836582b2, type: 3}
+    selectedColor: {r: 1, g: 1, b: 1, a: 0.75}
+    unselectedColor: {r: 1, g: 1, b: 1, a: 0.5}
+    iconColor: {r: 1, g: 1, b: 1, a: 1}
+    selectedIconColor: {r: 1, g: 1, b: 1, a: 1}
+    turnTime: 1
+    rushMultiplier: 5
+    spawnStagger: 0.06
+    popInSpeed: 8

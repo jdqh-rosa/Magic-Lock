@@ -1,311 +1,204 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
-public class RadialMenuController : MonoBehaviour
+namespace MagicLock.Radial
 {
-    public RadialMenu RadialMenuPrefab;
-    protected RadialMenu RadialMenuInstance;
-
-    public Canvas MenuCanvas;
-
-    [SerializeField] public List<RadialMenu> MenuLayers;
-    public int Index = 0;
-
-    public bool PremadeBool = false;
-
-    public List<string> Paths = new List<string>();
-
-    public float LayerRadiusDifference = 100f;
-
-    private void Start()
-    {
-        // Initialization if needed
-        if (!MenuCheck()) {
-            MenuLayers = new List<RadialMenu>();
-        }
-
-        if (PremadeBool) {
-            if (RadialMenuPrefab != null) {
-                PopulateMenuLayersFromPrefab();
-                MenuLayers[Index].Init();
-            }
-        }
-
-        //if (Paths == null)
-        //{
-        //    Paths = new List<string>();
-        //}
-        LogLayerCount();
-    }
-
-    public void Update() { }
-
-    public void CreateMenu(RadialMenu radialMenu = null)
-    {
-        if (PremadeBool) {
-            PopulateMenuLayersFromPrefab();
-            return;
-        }
-
-        if (!radialMenu) {
-            radialMenu = RadialMenuPrefab;
-        }
-
-        if (MenuLayers == null) {
-            MenuLayers = new List<RadialMenu>();
-        }
-
-        RadialMenuInstance = Instantiate(radialMenu, MenuCanvas.transform);
-        RadialMenuInstance.gameObject.SetActive(false);
-
-        if (MenuLayers.Count > 0) {
-            if (!MenuLayers[^1]) return;
-            MenuLayers[^1].Data.NextRing = RadialMenuInstance.Data;
-            RadialMenuInstance.radius = MenuLayers[^1].radius + LayerRadiusDifference;
-            RadialMenuInstance.callback = MenuLayers[Index].callback;
-        }
-
-        MenuLayers.Add(RadialMenuInstance);
-
-        if (Index == MenuLayers.Count - 1) {
-            MenuLayers[Index].SpawnButtons();
-        }
-
-        if (Paths == null) {
-            Paths = new List<string>();
-        }
-
-        if (Paths.Count <= Index) {
-            Paths.Add(MenuLayers[Index].path);
-        }
-        else {
-            Paths[Index] = MenuLayers[Index].path;
-        }
-    }
-
-    public void SpawnMenu()
-    {
-        if (!MenuCheck()) {
-            return;
-        }
-
-        // If there are already multiple layers, respawn the menu
-        if (MenuLayers.Count > 1) {
-            RespawnMenu();
-        }
-        // Otherwise, if createBool is true, create a new menu
-        else if (PremadeBool) {
-            CreateMenu();
-        }
-
-        // Activate the current menu layer and spawn its buttons
-        MenuLayers[Index].gameObject.SetActive(true);
-        MenuLayers[Index].SpawnButtons();
-    }
-
-    public void DestroyMenu()
-    {
-        if (!MenuCheck()) {
-            return;
-        }
-
-        foreach (var layer in MenuLayers) {
-            DestroyImmediate(layer.gameObject);
-        }
-
-        MenuLayers.Clear();
-        Paths.Clear();
-        Index = 0;
-    }
-
-    public void RespawnMenu()
-    {
-        List<RadialMenu> tempLayers = new List<RadialMenu>();
-
-        foreach (RadialMenu menu in MenuLayers) {
-            tempLayers.Add(menu);
-        }
-
-        DestroyMenu();
-
-        foreach (RadialMenu menu in tempLayers) {
-            CreateMenu(menu);
-        }
-
-        LogLayerCount();
-    }
-
-    public void TurnMenuRight()
-    {
-        if (!MenuCheck()) {
-            return;
-        }
-
-        MenuLayers[Index].TurnMenu(-1);
-    }
-
-    public void TurnMenuLeft()
-    {
-        if (!MenuCheck()) {
-            return;
-        }
-
-        MenuLayers[Index].TurnMenu(1);
-    }
-
-    public string NextRing()
-    {
-        if (!MenuCheck()) {
-            return null;
-        }
-
-        // Get the next data ring.
-        var next = MenuLayers[Index].Data?.NextRing;
-        // Check if we can navigate to the next menu.
-        bool hasNextLayer = (PremadeBool && next != null) ||
-                            (Index + 1 < MenuLayers.Count && MenuLayers[Index + 1] != null);
-
-        if (hasNextLayer) {
-#if UNITY_EDITOR
-            Debug.Log($"index: {Index + 1}, count: {MenuLayers.Count}", this);
-#endif
-
-            if (Index + 1 == MenuLayers.Count) {
-                return null;
-            }
-
-            MenuLayers[Index].NextRing(false);
-
-            // Update or add the path for the current menu.
-            if (Paths.Count > Index) {
-                Paths[Index] = MenuLayers[Index].path;
-            }
-            else {
-                Paths.Add(MenuLayers[Index].path);
-            }
-
-            // Move to the next menu layer.
-            Index++;
-
-            // Show the next ring.
-            MenuLayers[Index].gameObject.SetActive(true);
-
-            if (!MenuLayers[Index].initialized) {
-                MenuLayers[Index].Init();
-            }
-
-            return null;
-        }
-
-        // Handle the case where there are no further layers.
-        MenuLayers[Index].NextRing(false);
-
-        // Update or add the path for the current menu.
-        if (Paths.Count > Index) {
-            Paths[Index] = MenuLayers[Index].path;
-        }
-        else {
-            Paths.Add(MenuLayers[Index].path);
-        }
-
-        // Summarize the paths taken.
-        string pathSummary = string.Join(", ", Paths);
-
-#if UNITY_EDITOR
-        Debug.Log(pathSummary, this);
-#endif
-
-        // Return the final path.
-        return MenuLayers[Index].path;
-    }
-
-    public void PreviousRing()
-    {
-        if (!MenuCheck()) {
-            return;
-        }
-
-        if (Index <= 0) return;
-        MenuLayers[Index].gameObject.SetActive(false);
-        --Index;
-    }
-
     /// <summary>
-    /// Finds all layers of RadialMenu starting from the RadialMenuPrefab and adds them to MenuLayers.
+    /// Drives a layered radial menu. Each ring in the chain starting at <see cref="RootRing"/> becomes one layer,
+    /// instantiated from <see cref="menuPrefab"/>; the template's style sets radius and visuals. Confirming on the last layer raises
+    /// <see cref="PathSelected"/> / <see cref="onPathSelected"/> with one element per layer.
+    /// Input is not handled here: call the public methods from whatever input source you use.
     /// </summary>
-    private void PopulateMenuLayersFromPrefab()
+    public class RadialMenuController : MonoBehaviour
     {
-        if (!RadialMenuPrefab) {
-            Debug.LogError("RadialMenuPrefab is not assigned.");
-            return;
+        [Serializable]
+        public class PathEvent : UnityEvent<string> { }
+
+        [Tooltip("Template instantiated once per layer.")]
+        [FormerlySerializedAs("RadialMenuPrefab")]
+        public RadialMenu menuPrefab;
+
+        [Tooltip("First ring of the menu; its NextRing chain makes the other layers. Empty = the template's Data.")]
+        public RadialRing rootRing;
+
+        [Tooltip("Parent for the layers. Empty = this GameObject.")]
+        [FormerlySerializedAs("MenuCanvas")]
+        public Canvas menuCanvas;
+
+        public bool openOnStart;
+
+        [Tooltip("Close the menu after a full path is selected. Otherwise it returns to the first layer.")]
+        public bool closeOnSelect;
+
+        [Tooltip("Raised when the last layer is confirmed, with the element names joined by '/'.")]
+        public PathEvent onPathSelected = new PathEvent();
+
+        /// <summary>Raised when the last layer is confirmed, with the selected element of every layer.</summary>
+        public event Action<IReadOnlyList<RadialElement>> PathSelected;
+
+        /// <summary>Raised when turning changes the highlighted element: (layer index, element).</summary>
+        public event Action<int, RadialElement> SelectionChanged;
+
+        public event Action Opened;
+        public event Action Closed;
+
+        private readonly List<RadialMenu> _layers = new List<RadialMenu>();
+        private readonly List<RadialElement> _path = new List<RadialElement>();
+        private int _index;
+
+        public bool IsOpen { get; private set; }
+        public int LayerIndex => _index;
+        public IReadOnlyList<RadialMenu> Layers => _layers;
+        public RadialMenu CurrentLayer => _index < _layers.Count ? _layers[_index] : null;
+
+        /// <summary>Elements confirmed so far on the layers before the current one.</summary>
+        public IReadOnlyList<RadialElement> CurrentPath => _path;
+
+        public RadialRing RootRing => rootRing ? rootRing : menuPrefab ? menuPrefab.Data : null;
+
+        private void Start()
+        {
+            if (openOnStart) Open();
         }
 
-        if (MenuLayers == null) {
-            MenuLayers = new List<RadialMenu>();
+        private void OnDestroy() => DestroyLayers();
+
+        public void Open()
+        {
+            if (_layers.Count == 0) BuildLayers();
+            if (_layers.Count == 0) return;
+
+            ResetToFirstLayer();
+            if (IsOpen) return;
+            IsOpen = true;
+            Opened?.Invoke();
         }
 
-        // Clear existing layers and destroy instances to rebuild from the prefab.
-        DestroyMenu();
-
-        RadialRing currentLayer = RadialMenuPrefab.Data;
-        // Track visited layers.
-        HashSet<RadialRing> visitedLayers = new HashSet<RadialRing>(); 
-        
-        while (currentLayer) {
-            
-            // Break the loop if this layer has already been processed.
-            if (visitedLayers.Contains(currentLayer))
-            {
-                Debug.LogWarning("Circular reference detected. Stopping layer population.");
-                break;
+        public void Close()
+        {
+            foreach (var layer in _layers) {
+                layer.Clear();
+                layer.Hide();
             }
 
-            // Mark the current layer as visited.
-            visitedLayers.Add(currentLayer);
-            
-            // Instantiate a new radial menu and configure its properties.
-            RadialMenu newMenu = Instantiate(RadialMenuPrefab, MenuCanvas.transform);
-            newMenu.gameObject.SetActive(false);
-            // Add the current layer's data ring to the new menu.
-            newMenu.AddDataRing(currentLayer);
-
-            // Calculate and set the radius based on the previous menu's radius.
-            if (MenuLayers.Count > 0) {
-                newMenu.radius = MenuLayers[^1].radius + LayerRadiusDifference;
-            }
-
-            // Set the callback if there's a previous menu.
-            if (MenuLayers.Count > 1) {
-                newMenu.callback = MenuLayers[^2].callback;
-            }
-
-            // Add the new menu to the list.
-            MenuLayers.Add(newMenu);
-            // Move to the next layer in the hierarchy.
-            currentLayer = currentLayer.NextRing;
+            _path.Clear();
+            _index = 0;
+            if (!IsOpen) return;
+            IsOpen = false;
+            Closed?.Invoke();
         }
 
-        // Log the number of layers found for debugging purposes.
-        Debug.Log($"Populated {MenuLayers.Count} menu layers from RadialMenuPrefab.");
-    }
-
-    public bool MenuCheck()
-    {
-        LogLayerCount();
-        if (MenuLayers == null || MenuLayers.Count == 0 || !MenuLayers[Index] || MenuLayers.Count <= Index) {
-#if UNITY_EDITOR
-            Debug.LogWarning("Menu layers have not been created. Please create the menu first.", this);
-#endif
-            return false;
+        public void Toggle()
+        {
+            if (IsOpen) Close();
+            else Open();
         }
 
-        return true;
-    }
+        /// <summary>Recreate the layers, e.g. after the ring chain changed at runtime.</summary>
+        public void Rebuild()
+        {
+            bool wasOpen = IsOpen;
+            DestroyLayers();
+            IsOpen = false;
+            if (wasOpen) Open();
+        }
 
-    void LogLayerCount()
-    {
-#if UNITY_EDITOR
-        Debug.Log($"Layer Count: {MenuLayers?.Count ?? 0}", this);
-#endif
+        public void TurnLeft() => Turn(1);
+        public void TurnRight() => Turn(-1);
+
+        public void Turn(int steps)
+        {
+            if (IsOpen) CurrentLayer.Turn(steps);
+        }
+
+        /// <summary>Accept the highlighted element: open the next layer, or finish the path on the last layer.</summary>
+        public void Confirm()
+        {
+            if (!IsOpen) return;
+
+            RadialElement picked = CurrentLayer.SelectedElement;
+            if (!picked) return;
+            _path.Add(picked);
+
+            if (_index + 1 < _layers.Count) {
+                _index++;
+                _layers[_index].Show();
+                return;
+            }
+
+            RadialElement[] result = _path.ToArray();
+            if (closeOnSelect) Close();
+            else ResetToFirstLayer();
+
+            PathSelected?.Invoke(result);
+            onPathSelected.Invoke(JoinNames(result));
+        }
+
+        /// <summary>Hide the current layer and return to the previous one.</summary>
+        public void Back()
+        {
+            if (!IsOpen || _index == 0) return;
+
+            _layers[_index].Hide();
+            _index--;
+            _path.RemoveAt(_path.Count - 1);
+        }
+
+        public static string JoinNames(IReadOnlyList<RadialElement> path)
+        {
+            var names = new string[path.Count];
+            for (int i = 0; i < path.Count; i++) names[i] = path[i].DisplayName;
+            return string.Join("/", names);
+        }
+
+        private void BuildLayers()
+        {
+            RadialRing root = RootRing;
+            if (!menuPrefab || !root) {
+                Debug.LogWarning($"{name}: assign a menu prefab and a root ring before opening the radial menu.", this);
+                return;
+            }
+
+            Transform parent = menuCanvas ? menuCanvas.transform : transform;
+            int depth = 0;
+            foreach (RadialRing ring in root.Chain()) {
+                RadialMenu layer = Instantiate(menuPrefab, parent);
+                layer.name = $"{menuPrefab.name} [{depth}] {ring.name}";
+                layer.gameObject.SetActive(false);
+                layer.Bind(ring, depth);
+
+                int layerIndex = depth;
+                layer.SelectionChanged += element => SelectionChanged?.Invoke(layerIndex, element);
+
+                _layers.Add(layer);
+                depth++;
+            }
+        }
+
+        private void ResetToFirstLayer()
+        {
+            foreach (var layer in _layers) {
+                layer.Clear();
+                layer.Hide();
+            }
+
+            _path.Clear();
+            _index = 0;
+            _layers[0].Show();
+        }
+
+        private void DestroyLayers()
+        {
+            foreach (var layer in _layers) {
+                if (layer) Helper.DestroySafe(layer.gameObject);
+            }
+
+            _layers.Clear();
+            _path.Clear();
+            _index = 0;
+        }
     }
 }

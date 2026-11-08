@@ -1,0 +1,21 @@
+{
+    "name": "MagicLock.RadialMenu.Editor",
+    "rootNamespace": "MagicLock.Radial.Editor",
+    "references": [
+        "MagicLock.RadialMenu",
+        "MagicLock.RadialMenu.InputSystem",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

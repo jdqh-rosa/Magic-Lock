@@ -1,11 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "RadialElement", menuName = "RadialMenu/Element", order = 2)]
-public class RadialElement : ScriptableObject
+namespace MagicLock.Radial
 {
-    public string Name;
-    public Sprite Circle;
-    public Sprite Icon;
+    /// <summary>One selectable entry on a <see cref="RadialRing"/>.</summary>
+    [CreateAssetMenu(fileName = "RadialElement", menuName = "RadialMenu/Element", order = 2)]
+    public class RadialElement : ScriptableObject
+    {
+        public string Name;
+        public Sprite Circle;
+        public Sprite Icon;
+
+        [Tooltip("Per-element changes to the menu and ring style.")]
+        public RadialElementOverrides overrides = new RadialElementOverrides();
+
+        /// <summary><see cref="Name"/>, or the asset name when it is empty.</summary>
+        public string DisplayName => string.IsNullOrEmpty(Name) ? name : Name;
+    }
 }

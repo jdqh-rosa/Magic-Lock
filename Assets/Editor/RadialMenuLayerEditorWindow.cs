@@ -1,88 +1,61 @@
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using System.Collections.Generic;
 
-public class RadialMenuLayerEditorWindow : EditorWindow
+namespace MagicLock.Radial.Editor
 {
-    private RadialMenu layer;
-    private int layerIndex;
-    private ReorderableList list;
-
-    public void SetLayer(RadialMenu layer, int layerIndex)
+    /// <summary>Edits the elements of one <see cref="RadialRing"/> asset.</summary>
+    public class RadialMenuLayerEditorWindow : EditorWindow
     {
-        this.layer = layer;
-        this.layerIndex = layerIndex;
-        list = new ReorderableList(layer.Data.Elements, typeof(RadialElement), true, true, true, true);
+        [SerializeField] private RadialRing ring;
+        [SerializeField] private int layerIndex;
 
-        list.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+        private SerializedObject _serializedRing;
+        private ReorderableList _list;
+
+        public void SetRing(RadialRing pRing, int pLayerIndex)
         {
-            rect.y += 2;
-
-            // Get the RadialElement instance
-            var element = layer.Data.Elements[index];
-
-            // Display fields from the RadialElement scriptable object
-            EditorGUI.LabelField(new Rect(rect.x, rect.y, 60, EditorGUIUtility.singleLineHeight), "Element:");
-
-            // Draw the RadialElement object itself
-            layer.Data.Elements[index] = (RadialElement)EditorGUI.ObjectField(
-                new Rect(rect.x + 60, rect.y, rect.width - 60, EditorGUIUtility.singleLineHeight),
-                element, typeof(RadialElement), false);
-        };
-    }
-
-    private void OnGUI()
-    {
-        if (!layer)
-        {
-            EditorGUILayout.LabelField("No Radial Menu Layer assigned.");
-            return;
+            ring = pRing;
+            layerIndex = pLayerIndex;
+            _serializedRing = null;
         }
 
-        EditorGUILayout.LabelField($"Radial Menu Layer {layerIndex + 1} Editor", EditorStyles.boldLabel);
-        EditorGUILayout.Space();
-
-        // Editable fields for RadialMenu properties
-        layer.GapWidthDegree = EditorGUILayout.FloatField("Gap Width Degree", layer.GapWidthDegree);
-        layer.radius = EditorGUILayout.FloatField("Radius", layer.radius);
-
-        if (!layer.Data)
+        private void EnsureList()
         {
-            return;
-        }
+            if (_serializedRing != null && _serializedRing.targetObject == ring) return;
 
-        list.DoLayoutList();
-        /*
-        if (layer.Data)
-        {
-            EditorGUILayout.LabelField("Radial Elements", EditorStyles.boldLabel);
-            for (int i = 0; i < layer.Data.Elements.Length; i++)
+            _serializedRing = new SerializedObject(ring);
+            _list = new ReorderableList(_serializedRing, _serializedRing.FindProperty(nameof(RadialRing.Elements)),
+                true, true, true, true);
+            _list.drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Elements");
+            _list.drawElementCallback = (rect, index, isActive, isFocused) =>
             {
-                layer.Data.Elements[i] = (RadialElement)EditorGUILayout.ObjectField($"Element {i + 1}",
-                    layer.Data.Elements[i], typeof(RadialElement), true);
+                rect.y += 2;
+                rect.height = EditorGUIUtility.singleLineHeight;
+                EditorGUI.PropertyField(rect, _list.serializedProperty.GetArrayElementAtIndex(index),
+                    new GUIContent($"Element {index + 1}"));
+            };
+        }
+
+        private void OnGUI()
+        {
+            if (!ring) {
+                EditorGUILayout.LabelField("No radial ring assigned.");
+                return;
             }
-        }
 
-        if (GUILayout.Button("Add Element"))
-        {
-            layer.Data.AddElement(ScriptableObject.CreateInstance<RadialElement>());
-        }*/
+            EnsureList();
+            _serializedRing.Update();
 
-        // Save button
-        if (GUILayout.Button("Save Changes"))
-        {
-            EditorUtility.SetDirty(layer);
-            if (layer.Data)
-            {
-                EditorUtility.SetDirty(layer.Data);
-                foreach (var element in layer.Data.Elements)
-                {
-                    if (element)
-                    {
-                        EditorUtility.SetDirty(element);
-                    }
-                }
+            EditorGUILayout.LabelField($"Layer {layerIndex + 1}: {ring.name}", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(_serializedRing.FindProperty(nameof(RadialRing.MenuName)));
+            _list.DoLayoutList();
+
+            _serializedRing.ApplyModifiedProperties();
+
+            if (GUILayout.Button("Save Ring Asset")) {
+                AssetDatabase.SaveAssetIfDirty(ring);
             }
         }
     }
